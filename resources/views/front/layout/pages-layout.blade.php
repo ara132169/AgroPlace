@@ -236,7 +236,7 @@
                             <div class="swiper-slide banner banner-fixed br-xs">
                                 <figure>
                                     <img src="{{ asset('images/banners/' . get_settings()->site_bannero) }}" alt="Category Banner" width="440"
-                                        height="180" style="background-color: #E3DFDE;" />
+                                        height="180" style="background-color: #E3DFDE;" loading="lazy" />
                                 </figure>
                                 <div class="banner-content y-50">
                                     <h3 class="banner-title text-white text-capitalize">Insumos Agrícolas</h3>
@@ -251,7 +251,7 @@
                             <div class="swiper-slide banner banner-fixed br-xs">
                                 <figure>
                                     <img src="{{ asset('images/banners/' . get_settings()->site_bannert) }}" alt="Category Banner" width="440"
-                                        height="175" style="background-color: #272729;" />
+                                        height="175" style="background-color: #272729;" loading="lazy" />
                                 </figure>
                                 <div class="banner-content y-50">
                                
@@ -912,18 +912,19 @@
 
  
 
+    <!-- Critical JS -->
     <script src="/front/assets/vendor/jquery/jquery.min.js"></script>
-    <script src="/front/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="/front/assets/vendor/parallax/parallax.min.js"></script>
-    <script src="/front/assets/vendor/jquery.plugin/jquery.plugin.min.js"></script>
-    <script src="/front/assets/vendor/jquery.countdown/jquery.countdown.min.js"></script>
-    <script src="/front/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
-    <script src="/front/assets/vendor/isotope/isotope.pkgd.min.js"></script>
-    <script src="/front/assets/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
-    <script src="/front/assets/vendor/zoom/jquery.zoom.js"></script>
-
-    <!-- Main JS -->
     <script src="/front/assets/js/main.min.js"></script>
+    
+    <!-- Non-critical JS with defer -->
+    <script src="/front/assets/vendor/swiper/swiper-bundle.min.js" defer></script>
+    <script src="/front/assets/vendor/parallax/parallax.min.js" defer></script>
+    <script src="/front/assets/vendor/jquery.plugin/jquery.plugin.min.js" defer></script>
+    <script src="/front/assets/vendor/jquery.countdown/jquery.countdown.min.js" defer></script>
+    <script src="/front/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js" defer></script>
+    <script src="/front/assets/vendor/isotope/isotope.pkgd.min.js" defer></script>
+    <script src="/front/assets/vendor/magnific-popup/jquery.magnific-popup.min.js" defer></script>
+    <script src="/front/assets/vendor/zoom/jquery.zoom.js" defer></script>
 
 
     <script>

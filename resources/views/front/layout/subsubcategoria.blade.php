@@ -9,7 +9,7 @@
             @foreach($productos as $producto)
                 <div class="col-md-4">
                     <div class="product-card">
-                        <img src="{{ asset('images/products/' . $producto->product_image) }}" alt="{{ $producto->name }}">
+                        <img src="{{ asset('images/products/' . $producto->product_image) }}" alt="{{ $producto->name }}" loading="lazy">
                         <h4>{{ $producto->name }}</h4>
                         <p>{{ $producto->summary }}</p>
                         <p><strong>${{ number_format($producto->price, 2) }}</strong></p>

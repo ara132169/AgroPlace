@@ -111,7 +111,7 @@
                                         <figure class="product-media">
                                             <a href="product-default.html">
                                                 <img src="{{ asset('images/products/' . $producto->product_image) }}" alt="Product" width="300"
-                                                    height="338" />
+                                                    height="338" loading="lazy" />
                                             </a>
                                             
                                         </figure>

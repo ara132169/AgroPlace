@@ -40,24 +40,23 @@ if(!function_exists('sendEmail')){
     }
 }
 
-/** GET GENERAL SETTINGS */
+/** GET GENERAL SETTINGS WITH CACHE */
 if( !function_exists('get_settings') ){
     function get_settings(){
-        $results = null;
-        $settings = new GeneralSetting();
-        $settings_data = $settings->first();
+        return cache()->remember('site_settings', 3600, function () {
+            $settings = new GeneralSetting();
+            $settings_data = $settings->first();
 
-        if( $settings_data ){
-            $results = $settings_data;
-        }else{
-            $settings->insert([
-                'site_name'=>'AgroMarketPlace',
-                'site_email'=>'info@agromarketplace.com'
-            ]);
-            $new_settings_data = $settings->first();
-            $results = $new_settings_data;
-        }
-        return $results;
+            if( $settings_data ){
+                return $settings_data;
+            } else {
+                $settings->insert([
+                    'site_name'=>'AgroMarketPlace',
+                    'site_email'=>'info@agromarketplace.com'
+                ]);
+                return $settings->first();
+            }
+        });
     }
 }
 
@@ -85,11 +84,13 @@ if( !function_exists('get_social_network') ){
 }
 
 //FRONTEND::
-/** GET FRONT END CATEGORIES */
+/** GET FRONT END CATEGORIES WITH CACHE */
 if( !function_exists('get_categories') ){
     function get_categories(){
-        $categories = Category::with('subcategories')->orderBy('ordering','asc')->get();
-        return !empty($categories) ? $categories : [];
+        return cache()->remember('frontend_categories', 1800, function () {
+            $categories = Category::with('subcategories')->orderBy('ordering','asc')->get();
+            return !empty($categories) ? $categories : [];
+        });
     }
 }
 

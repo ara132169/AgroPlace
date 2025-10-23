@@ -22,6 +22,12 @@
         <link rel="shortcut icon" type="image/png" href="/front/assets/images/favicon.png">
     @endif
 
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/front/assets/css/style.min.css" as="style">
+    <link rel="preload" href="/front/assets/js/main.min.js" as="script">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+
     <!-- WebFont.js -->
     <script>
         WebFontConfig = {
@@ -43,14 +49,20 @@
             crossorigin="anonymous">
     <link rel="preload" href="/front/assets/fonts/wolmart.woff?png09e" as="font" type="font/woff" crossorigin="anonymous">
 
-    <!-- Vendor CSS -->
-    <link rel="stylesheet" type="text/css" href="/front/assets/vendor/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="/front/assets/vendor/animate/animate.min.css">
-
-    <!-- Plugin CSS -->
-    <link rel="stylesheet" href="/front/assets/vendor/swiper/swiper-bundle.min.css">
-    <link rel="stylesheet" type="text/css" href="/front/assets/vendor/magnific-popup/magnific-popup.min.css">
-
-    <!-- Default CSS -->
+    <!-- Critical CSS -->
     <link rel="stylesheet" type="text/css" href="/front/assets/css/style.min.css">
-        <link rel="stylesheet" type="text/css" href="/front/assets/css/demo7.min.css">
+    <link rel="stylesheet" type="text/css" href="/front/assets/css/demo7.min.css">
+    
+    <!-- Non-critical CSS loaded asynchronously -->
+    <link rel="preload" href="/front/assets/vendor/fontawesome-free/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/front/assets/vendor/animate/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/front/assets/vendor/swiper/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/front/assets/vendor/magnific-popup/magnific-popup.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- Fallback for non-JS users -->
+    <noscript>
+        <link rel="stylesheet" type="text/css" href="/front/assets/vendor/fontawesome-free/css/all.min.css">
+        <link rel="stylesheet" type="text/css" href="/front/assets/vendor/animate/animate.min.css">
+        <link rel="stylesheet" href="/front/assets/vendor/swiper/swiper-bundle.min.css">
+        <link rel="stylesheet" type="text/css" href="/front/assets/vendor/magnific-popup/magnific-popup.min.css">
+    </noscript>

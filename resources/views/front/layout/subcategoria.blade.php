@@ -6,7 +6,7 @@
     <div class="productos">
         @foreach($productos as $producto)
             <div class="producto">
-                <img src="{{ asset('images/products/' . $producto->product_image) }}" alt="{{ $producto->name }}">
+                <img src="{{ asset('images/products/' . $producto->product_image) }}" alt="{{ $producto->name }}" loading="lazy">
                 <h2>{{ $producto->name }}</h2>
                 <p>{{ $producto->summary }}</p>
                 <p>Precio: ${{ $producto->price }}</p>
