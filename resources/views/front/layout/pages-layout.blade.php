@@ -235,7 +235,7 @@
                     <div class="swiper-wrapper row cols-lg-3 cols-sm-2 cols-1">
                             <div class="swiper-slide banner banner-fixed br-xs">
                                 <figure>
-                                    <img src="/images/banners/{{ get_settings()->site_bannero}}" alt="Category Banner" width="440"
+                                    <img src="{{ asset('images/banners/' . get_settings()->site_bannero) }}" alt="Category Banner" width="440"
                                         height="180" style="background-color: #E3DFDE;" />
                                 </figure>
                                 <div class="banner-content y-50">
@@ -250,7 +250,7 @@
                             <!-- End of Categpry Banner -->
                             <div class="swiper-slide banner banner-fixed br-xs">
                                 <figure>
-                                    <img src="/images/banners/{{ get_settings()->site_bannert}}" alt="Category Banner" width="440"
+                                    <img src="{{ asset('images/banners/' . get_settings()->site_bannert) }}" alt="Category Banner" width="440"
                                         height="175" style="background-color: #272729;" />
                                 </figure>
                                 <div class="banner-content y-50">

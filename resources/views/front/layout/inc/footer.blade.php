@@ -42,7 +42,7 @@
                         <div class="col-lg-4 col-sm-6">
                             <div class="widget widget-about mt-0">
                                 <a href="demo7.html" class="logo-footer">
-                                    <img src="/images/site/{{ get_settings()->site_logo}}" alt="logo-footer" width="185"
+                                    <img src="{{ asset('images/site/' . get_settings()->site_logo) }}" alt="logo-footer" width="185"
                                         height="75" />
                                 </a>
                                 <div class="widget-body">

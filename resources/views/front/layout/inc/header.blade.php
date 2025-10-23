@@ -43,7 +43,7 @@
                         <a href="#" class="mobile-menu-toggle w-icon-hamburger" aria-label="menu-toggle">
                         </a>
                          <a href="{{ url('/') }}" class="logo ml-lg-0">
-                            <img src="/images/site/{{ get_settings()->site_logo}}" alt="logo" width="174" height="65" />
+                            <img src="{{ asset('images/site/' . get_settings()->site_logo) }}" alt="logo" width="174" height="65" />
                         </a>
                         <form method="get" action="#" class="input-wrapper header-search hs-expanded hs-round d-none d-md-flex">
                             <div class="select-box">

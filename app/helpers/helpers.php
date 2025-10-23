@@ -92,3 +92,19 @@ if( !function_exists('get_categories') ){
         return !empty($categories) ? $categories : [];
     }
 }
+
+/** GET IMAGE URL WITH FALLBACK */
+if( !function_exists('get_image') ){
+    function get_image($path, $default = 'default.jpg'){
+        if( empty($path) ){
+            return asset('images/' . $default);
+        }
+        
+        $fullPath = public_path('images/' . $path);
+        if( file_exists($fullPath) ){
+            return asset('images/' . $path);
+        }
+        
+        return asset('images/' . $default);
+    }
+}
