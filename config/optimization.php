@@ -1,4 +1,5 @@
 <?php
+if (!class_exists('ImageOptimizer')) {
 class ImageOptimizer {
     private $uploadDir;
     private $maxWidth = 1200;
@@ -45,10 +46,10 @@ class ImageOptimizer {
         
         $optimized = imagecreatetruecolor($newWidth, $newHeight);
         imagecopyresampled($optimized, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-        
+
         return $optimized;
     }
-    
+
     private function saveOptimizedImage($image, $file, $type) {
         switch ($type) {
             case IMAGETYPE_JPEG: return imagejpeg($image, $file, $this->quality);
@@ -58,7 +59,9 @@ class ImageOptimizer {
         }
     }
 }
+}
 
+if (!class_exists('CacheManager')) {
 class CacheManager {
     private $cacheDir = 'cache/';
     private $defaultExpiration = 3600; // 1 hora
@@ -79,5 +82,6 @@ class CacheManager {
         $file = $this->cacheDir . md5($key) . '.cache';
         return file_put_contents($file, serialize($data));
     }
+}
 }
 ?>

@@ -242,7 +242,7 @@
                                         <!-- End of Megamenu -->
                                     </li>
                                     <li>
-                                        <a href="vendor-dokan-store.html">Tiendas</a>
+                                        <a href="{{ route('tiendas.index') }}">Tiendas</a>
                                        
                                     </li>
                                     <li>
