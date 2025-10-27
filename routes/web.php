@@ -45,10 +45,10 @@
     Route::get('/vendedor/{username}', [FrontEndController::class, 'perfilVendedor'])->name('perfil.vendedor');
 
     Route::get('/carrito', [FrontEndController::class, 'verCarrito'])->name('front.layout.pages.cliente.carrito.index');
-    Route::get('/cliente/carrito', [CartController::class, 'index'])->name('cliente.carrito.index');
+    // Route::get('/cliente/carrito', [CartController::class, 'index'])->name('cliente.carrito.index');
     // Disminuir cantidad
-    Route::post('/carrito/disminuir/{id}', [CartController::class, 'disminuir'])->name('carrito.disminuir');
-    Route::post('/carrito/eliminar/{id}', [CartController::class, 'eliminar'])->name('carrito.eliminar');
+    // Route::post('/carrito/disminuir/{id}', [CartController::class, 'disminuir'])->name('carrito.disminuir');
+    // Route::post('/carrito/eliminar/{id}', [CartController::class, 'eliminar'])->name('carrito.eliminar');
     Route::get('/categoria/{slug}', [FrontEndController::class, 'productosPorCategoria'])->name('categoria.productos');
 
 
@@ -90,7 +90,7 @@
         Route::get('/tiendas', [FrontEndController::class, 'mostrarTiendas'])->name('tiendas.index');
 
         // Ruta para mostrar detalle de tienda - usar controlador existente
-        Route::get('/tienda/{id}', [FrontEndController::class, 'detalleTienda'])->name('tienda.detalle');
+        Route::get('/tienda/detalle/{id}', [FrontEndController::class, 'detalleTienda'])->name('tienda.detalle');
 
 
 
