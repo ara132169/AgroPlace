@@ -47,6 +47,30 @@
 			.swal2-popup{
 				font-size: 0.8em;
 			}
+			
+			/* Estilos para el menú dropdown que funciona correctamente */
+			#accordion-menu .dropdown > ul.submenu {
+				display: none;
+				background-color: #f8f9fa;
+				margin-left: 20px;
+				border-left: 2px solid #007bff;
+				transition: all 0.3s ease;
+			}
+			
+			#accordion-menu .dropdown.show > ul.submenu {
+				display: block;
+			}
+			
+			#accordion-menu .dropdown > a.dropdown-toggle:after {
+				content: '▼';
+				float: right;
+				font-size: 0.8em;
+				transition: transform 0.3s ease;
+			}
+			
+			#accordion-menu .dropdown.show > a.dropdown-toggle:after {
+				transform: rotate(180deg);
+			}
 		</style>
 		@kropifyStyles 
 		@livewireStyles
@@ -572,18 +596,13 @@
 
 		<!-- js -->
 		<script src="/back/vendors/scripts/core.js"></script>
-		<script src="/back/vendors/scripts/script.min.js"></script>
+		<script src="/back/vendors/scripts/script.js"></script>
 		<script src="/back/vendors/scripts/process.js"></script>
 		<script src="/back/vendors/scripts/layout-settings.js"></script>
 		<script src="/extra-assets/ijaboCropTool/ijaboCropTool.min.js"></script>
 		<script src="/extra-assets/jquery-ui-1.14.1/jquery-ui-1.14.1/jquery-ui.min.js"></script>
 		<script src="/extra-assets/summernote/summernote-bs4.min.js"></script>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Toastr -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 		
 
@@ -592,6 +611,34 @@
                 $('.summernote').summernote({
 					height:200
 				});
+
+				// Solución simple y confiable para el menú dropdown
+				$('#accordion-menu .dropdown > a.dropdown-toggle').on('click', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					
+					var $dropdown = $(this).parent('.dropdown');
+					var $submenu = $dropdown.find('ul.submenu');
+					
+					console.log("Click en menú dropdown - elemento:", $dropdown.length);
+					
+					// Cerrar otros dropdowns
+					$('#accordion-menu .dropdown').not($dropdown).removeClass('show');
+					$('#accordion-menu .dropdown').not($dropdown).find('ul.submenu').slideUp(300);
+					
+					// Toggle el dropdown actual
+					if ($dropdown.hasClass('show')) {
+						$dropdown.removeClass('show');
+						$submenu.slideUp(300);
+						console.log("Cerrando dropdown");
+					} else {
+						$dropdown.addClass('show');
+						$submenu.slideDown(300);
+						console.log("Abriendo dropdown");
+					}
+				});
+
+				console.log("Sistema de menú dropdown inicializado");
 			});
 		</script>
 		<script>

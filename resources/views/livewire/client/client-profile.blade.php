@@ -33,7 +33,22 @@
 											<!-- Timeline Tab start -->
                                             <div class="tab-pane fade {{ $tab == 'personal_details' ? 'active show' : '' }}" id="personal_details" role="tabpanel">
                                 <div class="pd-20">
-                                    <form wire:submit='updateclientPersonalDetails()'>
+                                    <!-- Mensajes de éxito y error -->
+                                    @if (session()->has('success'))
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            {{ session('success') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    
+                                    @if (session()->has('error'))
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            {{ session('error') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    
+                                    <form wire:submit='updateClientPersonalDetails()'>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -89,6 +104,21 @@
 											<!-- Tasks Tab start -->
 											<div class="tab-pane fade {{ $tab == 'update_password' ? 'active show' : '' }}" id="update_password" role="tabpanel">
                                             <div class="pd-20 profile-task-wrap">
+                                    <!-- Mensajes de éxito y error para contraseña -->
+                                    @if (session()->has('success'))
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            {{ session('success') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    
+                                    @if (session()->has('error'))
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            {{ session('error') }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    @endif
+                                    
                                     <form wire:submit='updatePassword()'>
                                         <div class="row">
                                             <div class="col-md-4">
