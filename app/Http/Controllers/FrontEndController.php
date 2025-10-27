@@ -273,27 +273,34 @@ class FrontEndController extends Controller
 
         public function mostrarTiendas()
         {
-            // Usar Shop en lugar de VendorShop y agregar cache para mejor rendimiento
-            $tiendas = \Cache::remember('tiendas_listado', 1800, function () {
-                return Shop::with(['seller'])
-                    ->whereHas('seller', function($query) {
-                        $query->where('status', 1);
-                    })
-                    ->orderBy('shop_name')
-                    ->paginate(12);
+            // Obtener tiendas sin cache para debugging
+            $tiendas = Shop::select('id', 'seller_id', 'shop_name', 'shop_address', 'shop_phone', 'shop_logo', 'shop_banner', 'created_at')
+                ->with(['seller:id,name,username,status'])
+                ->whereHas('seller', function($query) {
+                    $query->where('status', 1); // Solo vendedores activos
+                })
+                ->orderBy('shop_name')
+                ->paginate(12);
+
+            // Agregar conteo de productos por tienda
+            $tiendas->getCollection()->transform(function ($tienda) {
+                if ($tienda->seller_id) {
+                    $tienda->products_count = Product::where('seller_id', $tienda->seller_id)->count();
+                } else {
+                    $tienda->products_count = 0;
+                }
+                return $tienda;
             });
 
             // Agregar las variables que necesita el layout
             $fechaLimite = Carbon::now()->subDays(3);
             
-            $productosConDescuento = \Cache::remember('productos_descuento_tiendas', 1800, function () use ($fechaLimite) {
-                return Product::whereNotNull('compare_price')
-                    ->where('visibility', 1)
-                    ->where('created_at', '>=', $fechaLimite)
-                    ->latest()
-                    ->take(4)
-                    ->get();
-            });
+            $productosConDescuento = Product::whereNotNull('compare_price')
+                ->where('visibility', 1)
+                ->where('created_at', '>=', $fechaLimite)
+                ->latest()
+                ->take(4)
+                ->get();
 
             // Si no hay descuentos activos recientes, mostramos productos aleatorios
             if ($productosConDescuento->isEmpty()) {
@@ -303,7 +310,16 @@ class FrontEndController extends Controller
                     ->get();
             }
 
-            return view('front.layout.pages.tiendas', compact('tiendas', 'productosConDescuento'));
+            // Agregar vendedores para mostrar en la sección de vendedores
+            $vendedores = Seller::select('id', 'name', 'username', 'status')
+                ->with(['shop:id,seller_id,shop_name,shop_logo,shop_banner'])
+                ->where('status', 1)
+                ->whereHas('shop')
+                ->latest()
+                ->limit(8)
+                ->get();
+
+            return view('front.layout.pages.tiendas', compact('tiendas', 'productosConDescuento', 'vendedores'));
         }
 
         public function detalleTienda($id)

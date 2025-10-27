@@ -5,26 +5,29 @@
     
     @push('stylesheets')
     <style>
-    /* WCMP Store Styles - Based on Wolmart Demo */
+    /* WCMP Store Styles - Improved Design */
     .store-wcmp {
         background: #fff;
-        border-radius: 0.5rem;
+        border-radius: 1rem;
         overflow: hidden;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         position: relative;
+        border: 1px solid #e8f5e8;
     }
     
     .store-wcmp:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        transform: translateY(-5px);
+        box-shadow: 0 12px 35px rgba(34, 85, 48, 0.15);
+        border-color: #2c5530;
     }
 
     .store-banner {
         position: relative;
         margin: 0;
         overflow: hidden;
-        height: 200px;
+        height: 220px;
+        background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
     }
 
     .store-banner img {
@@ -35,27 +38,31 @@
     }
 
     .store-wcmp:hover .store-banner img {
-        transform: scale(1.05);
+        transform: scale(1.08);
     }
 
     .store-content {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem 1.5rem 1.5rem;
         position: relative;
     }
 
     .seller-brand {
         position: absolute;
-        top: -40px;
-        left: 1.5rem;
-        width: 80px;
-        height: 80px;
+        top: -45px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90px;
+        height: 90px;
         margin: 0;
         border-radius: 50%;
         overflow: hidden;
         background: #fff;
-        border: 4px solid #fff;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border: 5px solid #fff;
+        box-shadow: 0 8px 25px rgba(34, 85, 48, 0.2);
         z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .seller-brand img {
@@ -67,23 +74,26 @@
 
     .seller-date {
         margin-top: 50px;
+        text-align: center;
     }
 
     .store-title {
-        margin: 0 0 1rem 0;
-        font-size: 1.25rem;
-        font-weight: 600;
+        margin: 0 0 1.5rem 0;
+        font-size: 1.4rem;
+        font-weight: 700;
         line-height: 1.3;
+        color: #2c5530;
     }
 
     .store-title a {
-        color: #333;
+        color: #2c5530;
         text-decoration: none;
         transition: color 0.3s ease;
     }
 
     .store-title a:hover {
-        color: #2c5530;
+        color: #1a3920;
+        text-decoration: underline;
     }
 
     .seller-info-list {
@@ -93,29 +103,49 @@
     }
 
     .seller-info-list li {
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
         display: flex;
         align-items: flex-start;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        background: #f8fdf8;
+        border-radius: 0.5rem;
+        border-left: 3px solid #2c5530;
     }
 
-    .store-address i {
-        color: #999;
-        margin-top: 0.25rem;
-        font-size: 0.875rem;
+    .store-address i,
+    .store-vendor i,
+    .store-phone i,
+    .store-member-since i,
+    .store-products i {
+        color: #2c5530;
+        margin-top: 0.1rem;
+        font-size: 1rem;
         flex-shrink: 0;
+        width: 20px;
+        text-align: center;
     }
 
-    .store-address p {
+    .store-address p,
+    .store-vendor p,
+    .store-phone p,
+    .store-member-since p,
+    .store-products p {
         margin: 0;
-        color: #666;
-        font-size: 0.875rem;
-        line-height: 1.4;
+        color: #555;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        font-weight: 500;
     }
 
     .store-rating {
         display: flex;
         align-items: center;
+        justify-content: center;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
     }
 
     .ratings-container {
@@ -153,15 +183,17 @@
 
     /* Vendor Filter Styles */
     .vendor-filter {
-        background: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
+        background: linear-gradient(135deg, #f8fdf8 0%, #e8f5e8 100%);
+        padding: 2rem;
+        border-radius: 1rem;
         margin-bottom: 2rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 1rem;
+        border: 1px solid #d4edda;
+        box-shadow: 0 4px 15px rgba(34, 85, 48, 0.08);
     }
 
     .vendor-filter-left {
@@ -172,8 +204,9 @@
     }
 
     .vendor-filter-right {
-        color: #666;
-        font-weight: 500;
+        color: #2c5530;
+        font-weight: 600;
+        font-size: 1rem;
     }
 
     .select-box {
@@ -191,23 +224,28 @@
     }
 
     .btn-rounded {
-        border-radius: 1.5rem;
-        padding: 0.5rem 1.5rem;
-        font-size: 0.875rem;
-        font-weight: 500;
+        border-radius: 2rem;
+        padding: 0.75rem 2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
         border: none;
         cursor: pointer;
         transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .btn-dark {
-        background: #333;
+        background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
         color: #fff;
+        border: 2px solid transparent;
     }
 
     .btn-dark:hover {
-        background: #222;
+        background: linear-gradient(135deg, #1a3920 0%, #2c5530 100%);
         color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(34, 85, 48, 0.3);
     }
 
     /* Store Grid */
@@ -235,9 +273,10 @@
 
     /* Breadcrumb */
     .breadcrumb-nav {
-        background: #f8f9fa;
-        padding: 1rem 0;
+        background: linear-gradient(135deg, #f8fdf8 0%, #e8f5e8 100%);
+        padding: 1.5rem 0;
         margin-bottom: 0;
+        border-bottom: 1px solid #d4edda;
     }
 
     .breadcrumb {
@@ -246,27 +285,32 @@
         list-style: none;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
     .breadcrumb li {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
+        color: #2c5530;
     }
 
     .breadcrumb li:not(:last-child)::after {
-        content: '/';
-        color: #999;
+        content: '▶';
+        color: #4a7c59;
+        font-size: 0.8rem;
     }
 
     .breadcrumb a {
         color: #2c5530;
         text-decoration: none;
+        transition: color 0.3s ease;
     }
 
     .breadcrumb a:hover {
+        color: #1a3920;
         text-decoration: underline;
     }
 
@@ -323,29 +367,39 @@
         line-height: 1.4;
     }
 
-    /* Icon replacements for w-icon classes */
+    /* Icon replacements with FontAwesome */
     .w-icon-map-marker::before {
-        content: "📍";
+        content: "\f3c5";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
         font-style: normal;
     }
 
     .w-icon-user::before {
-        content: "👤";
+        content: "\f007";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
         font-style: normal;
     }
 
     .w-icon-phone::before {
-        content: "📞";
+        content: "\f095";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
         font-style: normal;
     }
 
     .w-icon-clock::before {
-        content: "🕒";
+        content: "\f017";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
         font-style: normal;
     }
 
     .w-icon-cart::before {
-        content: "🛒";
+        content: "\f07a";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
         font-style: normal;
     }
 
@@ -395,7 +449,7 @@
 
 <body class="home">
     <div class="page-wrapper">
-        @include('front.layout.inc.header')
+        @include('front.layout.inc.headerdos')
 
         <main class="main">
             <!-- Start of Breadcrumb -->
@@ -437,7 +491,7 @@
                     <!-- End of Vendor Filter -->
 
                     <!-- Start of Vendor Store -->
-                    <div class="row cols-lg-3 cols-sm-2">
+                    <div class="row cols-lg-3">
                         @if($tiendas && $tiendas->count() > 0)
                             @foreach($tiendas as $tienda)
                             <div class="store-wrap mb-4">
@@ -546,6 +600,7 @@
                             {{ $tiendas->links() }}
                         </div>
                     @endif
+
                 </div>
             </div>
             <!-- End of Page Content -->
@@ -554,51 +609,26 @@
         @include('front.layout.inc.footer')
     </div>
 
-    <!-- JavaScript for enhanced functionality -->
+      <!-- Start of Sticky Footer -->
+    @include('front.layout.inc.footermovil')
+    <!-- End of Sticky Footer -->
+
+    <!-- Start of Scroll Top -->
+    <a id="scroll-top" class="scroll-top" href="#top" title="Top" role="button"> <i class="w-icon-angle-up"></i> <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 70"> <circle id="progress-indicator" fill="transparent" stroke="#000000" stroke-miterlimit="10" cx="35" cy="35" r="34" style="stroke-dasharray: 16.4198, 400;"></circle> </svg> </a>
+    <!-- End of Scroll Top -->
+
+    <!-- Start of Mobile Menu -->
+        @include('front.layout.inc.mobile-menu')
+    <!-- End of Mobile Menu -->
+
+    <!-- JavaScript simplificado -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Lazy loading for images
-        const lazyImages = document.querySelectorAll('img[loading="lazy"]');
-        
-        if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        if (img.dataset.src) {
-                            img.src = img.dataset.src;
-                            img.classList.remove('lazy');
-                            imageObserver.unobserve(img);
-                        }
-                    }
-                });
-            });
-
-            lazyImages.forEach(img => imageObserver.observe(img));
-        }
-
-        // Store hover effects
-        const storeCards = document.querySelectorAll('.store-wcmp');
-        storeCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-2px)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Sort functionality
-        const sortSelect = document.querySelector('select[name="sortby"]');
-        if (sortSelect) {
-            sortSelect.addEventListener('change', function() {
-                // Add sorting logic here if needed
-                console.log('Sort by:', this.value);
-            });
-        }
-    });
+    // JavaScript básico sin conflictos
     </script>
+
+    <!-- Plugin JS File -->
+    <script src="/front/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="/front/assets/js/main.min.js"></script>
 
 </body>
 </html>
