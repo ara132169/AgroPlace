@@ -3,10 +3,7 @@
         }">
 
         <div class="footer-newsletter bg-agrodark">
-           
-          
        </div>
-        
             <div class="footer-newsletter bg-agro">
            
                 <div class="container">

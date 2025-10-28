@@ -22,9 +22,9 @@
             <nav class="breadcrumb-nav">
                 <div class="container">
                     <ul class="breadcrumb shop-breadcrumb bb-no">
-                        <li class="active"><a href="cart.html">Shopping Cart</a></li>
-                        <li><a href="checkout.html">Checkout</a></li>
-                        <li><a href="order.html">Order Complete</a></li>
+                        <li class="active"><a href="cart.html">Carrito de compra</a></li>
+                        <li><a href="checkout.html">Finalizar compra</a></li>
+                        <li><a href="order.html">Completar orden</a></li>
                     </ul>
                 </div>
             </nav>
@@ -33,95 +33,87 @@
             <!-- Start of PageContent -->
             <div class="page-content">
                 <div class="container">
+                    <!-- Calcular subtotal si no existe -->
+                    @php
+                        if (!isset($subtotal)) {
+                            $subtotal = collect($cartItems ?? [])->sum(function ($item) {
+                                return $item['price'] * $item['quantity'];
+                            });
+                        }
+                    @endphp
+                
+                 
+                    <!-- Fin debug -->
                     <div class="row gutter-lg mb-10">
                         <div class="col-lg-8 pr-lg-4 mb-6">
                             <table class="shop-table cart-table">
                                 <thead>
                                     <tr>
-                                        <th class="product-name"><span>Product</span></th>
+                                        <th class="product-name"><span>Producto</span></th>
                                         <th></th>
-                                        <th class="product-price"><span>Price</span></th>
-                                        <th class="product-quantity"><span>Quantity</span></th>
+                                        <th class="product-price"><span>Precio</span></th>
+                                        <th class="product-quantity"><span>Cantidad</span></th>
                                         <th class="product-subtotal"><span>Subtotal</span></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @foreach ($cartItems as $item)
+                                @forelse ($cartItems as $id => $item)
                                     <tr>
                                         <td class="product-thumbnail">
                                             <div class="p-relative">
-                                                <a href="product-default.html">
-                                               
+                                                <a href="#">
+                                                    <figure>
+                                                        <img src="{{ asset('images/products/' . ($item['image'] ?? 'default.jpg')) }}" alt="{{ $item['name'] }}" width="84" height="94" />
+                                                    </figure>
                                                 </a>
                                                 <button type="submit" class="btn btn-close"><i
                                                         class="fas fa-times"></i></button>
                                             </div>
                                         </td>
                                         <td class="product-name">
-                                            <a href="product-default.html">
-                                              {{ $item->product->name }}
+                                            <a href="#">
+                                              {{ $item['name'] }}
                                             </a>
                                         </td>
-                                        <td class="product-price"><span class="amount">{{ $item->product->price }}</span></td>
+                                        <td class="product-price"><span class="amount">${{ number_format($item['price'], 2) }}</span></td>
                                         <td class="product-quantity">
                                             <div class="input-group">
-                                                <input class="quantity form-control" type="number" min="1" max="100000">
+                                                <input class="quantity form-control" type="number" min="1" max="100000" value="{{ $item['quantity'] }}">
                                                 <button class="quantity-plus w-icon-plus"></button>
                                                 <button class="quantity-minus w-icon-minus"></button>
                                             </div>
                                         </td>
                                         <td class="product-subtotal">
-                                            <span class="amount">$40.00</span>
+                                            <span class="amount">${{ number_format($item['price'] * $item['quantity'], 2) }}</span>
                                         </td>
                                     </tr>
-                                @endforeach
-                                    
-                   <!-- <div class="cart-item">
-                        <div class="d-flex justify-content-between">
-                            <div class="product-details">
-                                <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" width="50">
-                                <span>{{ $item->product->name }}</span>
-                            </div>
-                            <div class="product-quantity">
-                                <form action="" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $item->product_id }}">
-                                    <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" style="width: 50px;">
-                                    <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
-                                </form>
-                            </div>
-                            <div class="product-remove">
-                                <form action="" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $item->product_id }}">
-                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div> -->
-              
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Tu carrito está vacío.</td>
+                                    </tr>
+                                @endforelse
                                 </tbody>
                             </table>
 
                             <div class="cart-action mb-6">
-                                <a href="#" class="btn btn-dark btn-rounded btn-icon-left btn-shopping mr-auto"><i class="w-icon-long-arrow-left"></i>Continue Shopping</a>
-                                <button type="submit" class="btn btn-rounded btn-default btn-clear" name="clear_cart" value="Clear Cart">Clear Cart</button> 
-                                <button type="submit" class="btn btn-rounded btn-update disabled" name="update_cart" value="Update Cart">Update Cart</button>
+                                <a href="{{ url('/') }}" class="btn btn-dark btn-rounded btn-icon-left btn-shopping mr-auto"><i class="w-icon-long-arrow-left"></i>Continuar comprando</a>
+                                <button type="submit" class="btn btn-rounded btn-default btn-clear" name="clear_cart" value="Clear Cart">Limpiar carrito</button> 
+                                <button type="submit" class="btn btn-rounded btn-update disabled" name="update_cart" value="Update Cart">Actualizar carrito</button>
                             </div>
 
                             <form class="coupon">
-                                <h5 class="title coupon-title font-weight-bold text-uppercase">Coupon Discount</h5>
+                                <h5 class="title coupon-title font-weight-bold text-uppercase">Cupón de descuento</h5>
                                 <input type="text" class="form-control mb-4" placeholder="Enter coupon code here..." required />
-                                <button class="btn btn-dark btn-outline btn-rounded">Apply Coupon</button>
+                                <button class="btn btn-dark btn-outline btn-rounded">Aplicar cupón</button>
                             </form>
                         </div>
                         <div class="col-lg-4 sticky-sidebar-wrapper">
                             <div class="sticky-sidebar">
                                 <div class="cart-summary mb-4">
-                                    <h3 class="cart-title text-uppercase">Cart Totals</h3>
+                                    <h3 class="cart-title text-uppercase">Total del carrito</h3>
                                     <div class="cart-subtotal d-flex align-items-center justify-content-between">
                                         <label class="ls-25">Subtotal</label>
-                                        <span>$100.00</span>
+                                        <span>${{ number_format($subtotal ?? 0, 2) }}</span>
                                     </div>
 
                                     <hr class="divider">
@@ -129,15 +121,15 @@
                                     <ul class="shipping-methods mb-2">
                                         <li>
                                             <label
-                                                class="shipping-title text-dark font-weight-bold">Shipping</label>
+                                                class="shipping-title text-dark font-weight-bold">Envío</label>
                                         </li>
                                         <li>
                                             <div class="custom-radio">
                                                 <input type="radio" id="free-shipping" class="custom-control-input"
                                                     name="shipping">
                                                 <label for="free-shipping"
-                                                    class="custom-control-label color-dark">Free
-                                                    Shipping</label>
+                                                    class="custom-control-label color-dark">Envío
+                                                    gratis</label>
                                             </div>
                                         </li>
                                         <li>
@@ -145,22 +137,22 @@
                                                 <input type="radio" id="local-pickup" class="custom-control-input"
                                                     name="shipping">
                                                 <label for="local-pickup"
-                                                    class="custom-control-label color-dark">Local
-                                                    Pickup</label>
+                                                    class="custom-control-label color-dark">Recogida
+                                                    local</label>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="custom-radio">
                                                 <input type="radio" id="flat-rate" class="custom-control-input"
                                                     name="shipping">
-                                                <label for="flat-rate" class="custom-control-label color-dark">Flat
-                                                    rate:
-                                                    $5.00</label>
+                                                <label for="flat-rate" class="custom-control-label color-dark">Tarifa
+                                                    
+                                                    </label>
                                             </div>
                                         </li>
                                     </ul>
 
-                                    <div class="shipping-calculator">
+                                   <!-- <div class="shipping-calculator">-->
                                         <p class="shipping-destination lh-1">Shipping to <strong>CA</strong>.</p>
 
                                         <form class="shipping-calculator-form">
@@ -194,19 +186,19 @@
                                                 <input class="form-control form-control-md" type="text"
                                                     name="zipcode" placeholder="ZIP">
                                             </div>
-                                            <button type="submit" class="btn btn-dark btn-outline btn-rounded">Update
-                                                Totals</button>
+                                            <button type="submit" class="btn btn-dark btn-outline btn-rounded">Actualizar
+                                                Total</button>
                                         </form>
                                     </div>
 
                                     <hr class="divider mb-6">
                                     <div class="order-total d-flex justify-content-between align-items-center">
                                         <label>Total</label>
-                                        <span class="ls-50">$100.00</span>
+                                        <span class="ls-50">${{ number_format($subtotal ?? 0, 2) }}</span>
                                     </div>
-                                    <a href="#"
+                                    <a href="{{ route('cliente.cliente.checkout') }}"
                                         class="btn btn-block btn-dark btn-icon-right btn-rounded  btn-checkout">
-                                        Proceed to checkout<i class="w-icon-long-arrow-right"></i></a>
+                                        Finalizar compra<i class="w-icon-long-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>

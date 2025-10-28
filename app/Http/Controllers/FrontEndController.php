@@ -188,12 +188,17 @@ class FrontEndController extends Controller
 
 
     public function verCarrito()
-{
-    $cliente = auth('client')->user();
-    $cartItems = Cart::where('client_id', $cliente->id)->get();
+    {
+        // Usar el mismo sistema de session que funciona en el header
+        $cartItems = session('cart', []);
+        
+        // Calcular el subtotal
+        $subtotal = collect($cartItems)->sum(function ($item) {
+            return $item['price'] * $item['quantity'];
+        });
 
-    return view('front.layout.pages.cliente.carrito.index', compact('cartItems'));
-}
+        return view('back.pages.cliente.compras.carrito', compact('cartItems', 'subtotal'));
+    }
 
 
 

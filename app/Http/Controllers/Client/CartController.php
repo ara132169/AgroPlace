@@ -96,9 +96,15 @@ class CartController extends Controller
 
     public function ver()
     {
-        $carrito = Cart::where('client_id', Auth::guard('client')->id())->with('product')->get();
+        // Usar el mismo sistema de session que funciona en el header
+        $cartItems = session('cart', []);
+        
+        // Calcular el subtotal
+        $subtotal = collect($cartItems)->sum(function ($item) {
+            return $item['price'] * $item['quantity'];
+        });
 
-        return view('front.layout.pages.cliente.carrito.index', compact('carrito'));
+        return view('back.pages.cliente.compras.carrito', compact('cartItems', 'subtotal'));
     }
 
     public function index()
