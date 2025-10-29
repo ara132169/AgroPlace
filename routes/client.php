@@ -32,9 +32,12 @@ Route::prefix('cliente')->name('cliente.')->group(function () {
         });
 
         Route::controller(CheckoutController::class)->group(function () {
-            
-            Route::get('/checkout', 'index')->name('cliente.checkout');
-            Route::post('/checkout/procesar', 'process')->name('cliente.checkout.procesar');
+            Route::get('/checkout', 'index')->name('checkout');
+            Route::post('/checkout/procesar', 'procesar')->name('checkout.procesar');
+            Route::post('/checkout/confirm-payment', 'confirmPayment')->name('checkout.confirm-payment');
+            Route::get('/checkout/mercadopago/{payment_id}', 'mercadoPagoCallback')->name('checkout.mercadopago');
+            Route::get('/pedido/{id}', 'detalles')->name('checkout.detalles');
+            Route::get('/pedido/{id}/pdf', 'downloadOrderPdf')->name('checkout.pdf');
         });
     });
 

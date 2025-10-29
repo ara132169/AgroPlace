@@ -196,7 +196,7 @@
                                         <label>Total</label>
                                         <span class="ls-50">${{ number_format($subtotal ?? 0, 2) }}</span>
                                     </div>
-                                    <a href="{{ route('cliente.cliente.checkout') }}"
+                                    <a href="{{ route('cliente.checkout') }}"
                                         class="btn btn-block btn-dark btn-icon-right btn-rounded  btn-checkout">
                                         Finalizar compra<i class="w-icon-long-arrow-right"></i></a>
                                 </div>

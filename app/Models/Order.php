@@ -20,7 +20,12 @@ class Order extends Model
         'shipping_phone',
         'shipping_email',
         'total',
-        'status'
+        'status',
+        // Campos de Stripe
+        'payment_method',
+        'stripe_payment_intent_id',
+        'stripe_payment_status',
+        'payment_currency',
     ];
 
     public function client()

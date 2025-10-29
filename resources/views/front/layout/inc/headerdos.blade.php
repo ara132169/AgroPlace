@@ -151,7 +151,7 @@
 
                                 <div class="cart-action">
                                     <a href="{{ route('cliente.carrito') }}" class="btn btn-dark btn-outline btn-rounded">Ver Carrito</a>
-                                    <a href="{{ route('cliente.cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
+                                    <a href="{{ route('cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
                                 </div>
                             </div>
                       

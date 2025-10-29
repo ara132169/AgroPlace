@@ -11,15 +11,15 @@
                         <a href="https://agro-marketmx.com/contacto" class="d-lg-show">Contacto</a>
                        
                         @auth('client')
-                        <span class="d-lg-show login">
+                        <a href="{{ route('cliente.panel') }}" class="d-lg-show login" style="text-decoration: none; color: inherit;">
                             <i class="w-icon-account"></i>Bienvenido, {{ Auth::guard('client')->user()->name }}
-                        </span>
+                        </a>
                         @endauth
 
                         @auth('seller')
-                            <span class="d-lg-show login">
+                            <a href="{{ route('tienda.home') }}" class="d-lg-show login" style="text-decoration: none; color: inherit;">
                                 <i class="w-icon-user"></i>Bienvenido, {{ Auth::guard('seller')->user()->name }}
-                            </span>
+                            </a>
                         @endauth
 
                         @guest('client')
@@ -141,7 +141,7 @@
 
                         <div class="cart-action">
                             <a href="{{ route('cliente.carrito') }}" class="btn btn-dark btn-outline btn-rounded">Ver Carrito</a>
-                            <a href="{{ route('cliente.cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
+                            <a href="{{ route('cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
 
                         </div>
                     </div>
