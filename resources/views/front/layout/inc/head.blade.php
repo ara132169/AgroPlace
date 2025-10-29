@@ -4,7 +4,7 @@
     <title>@yield('pageTitle')</title>
 
     <meta name="keywords" content="Marketplace " />
-    <meta name="description" content="Agro Marketplace - venta y compra de insumos agricolas">
+    <meta name="description" content="AgroPlace - venta y compra de insumos agricolas">
     <meta name="author" content="D-THEMES">
 
     <!-- Favicon -->

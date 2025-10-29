@@ -48,7 +48,7 @@
                    
 
 
-                        <form action="{{ route('cliente.checkout.procesar') }}" method="POST" class="form checkout-form" id="payment-form">
+                        <form action="{{ route('checkout.test.procesar') }}" method="POST" class="form checkout-form" id="payment-form">
                         @csrf
                             <div class="row mb-9">
                                 <div class="col-lg-7 pr-lg-4 mb-4">
@@ -379,13 +379,28 @@
                         
                         console.log('Response status:', response.status);
                         console.log('Response headers:', response.headers);
+                        console.log('Response URL:', response.url);
+                        
+                        // Get the response text first to see what we're getting
+                        const responseText = await response.text();
+                        console.log('Raw response:', responseText);
                         
                         if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            console.error('HTTP error:', response.status, responseText);
+                            throw new Error(`HTTP error! status: ${response.status} - ${responseText}`);
                         }
                         
-                        const result = await response.json();
-                        console.log('Response result:', result);
+                        // Try to parse as JSON
+                        let result;
+                        try {
+                            result = JSON.parse(responseText);
+                        } catch (parseError) {
+                            console.error('JSON parse error:', parseError);
+                            console.error('Response was:', responseText);
+                            throw new Error('Server response is not valid JSON');
+                        }
+                        
+                        console.log('Parsed result:', result);
                         
                         if (result.requires_action) {
                             // 3D Secure authentication required
@@ -398,7 +413,7 @@
                                 resetButton();
                             } else {
                                 // Payment succeeded after authentication
-                                const confirmResponse = await fetch('{{ route("cliente.checkout.confirm-payment") }}', {
+                                const confirmResponse = await fetch('{{ route("checkout.test.confirm-payment") }}', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -435,8 +450,10 @@
                             resetButton();
                         }
                     } catch (fetchError) {
-                        console.error('Network error:', fetchError);
-                        document.getElementById('card-errors').textContent = 'Error de red. Inténtalo de nuevo.';
+                        console.error('Network error details:', fetchError);
+                        console.error('Error message:', fetchError.message);
+                        console.error('Error stack:', fetchError.stack);
+                        document.getElementById('card-errors').textContent = `Error de red: ${fetchError.message}`;
                         resetButton();
                     }
                 }

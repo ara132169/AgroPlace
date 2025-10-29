@@ -13,6 +13,7 @@
     use App\Http\Controllers\Auth\SellerResetPasswordController;
     use App\Http\Controllers\Auth\ClientForgotPasswordController;
     use App\Http\Controllers\Auth\ClientResetPasswordController;
+    use App\Services\StripeService;
 
     /*
     |--------------------------------------------------------------------------
@@ -27,6 +28,62 @@
 
     Route::get('/', [FrontEndController::class, 'index'])->name('inicio');
     Route::view('/example-page','example-page');
+
+    // Debug routes
+    Route::get('/debug-session', function() {
+        return response()->json([
+            'cart' => session('cart', []),
+            'auth_client' => auth('client')->check(),
+            'auth_user' => auth('client')->user(),
+        ]);
+    });
+
+    Route::get('/debug-add-cart', function() {
+        $cart = [
+            [
+                'product_id' => 1,
+                'name' => 'Semilla de Maíz A7573 Tratada',
+                'price' => 85.00,
+                'quantity' => 1,
+            ]
+        ];
+        
+        session(['cart' => $cart]);
+        
+        return response()->json([
+            'message' => 'Cart added',
+            'cart' => session('cart'),
+        ]);
+    });
+
+    Route::get('/debug-login', function() {
+        // Find or create a test client
+        $client = \App\Models\Client::first();
+        if (!$client) {
+            $client = \App\Models\Client::create([
+                'name' => 'Test Client',
+                'username' => 'testclient',
+                'email' => 'test@client.com',
+                'password' => bcrypt('password'),
+                'status' => 1,
+            ]);
+        }
+        
+        auth('client')->login($client);
+        
+        return response()->json([
+            'message' => 'Client logged in',
+            'client' => $client,
+            'auth_check' => auth('client')->check(),
+        ]);
+    });
+
+    // Rutas temporales de checkout sin autenticación para pruebas
+    Route::get('/checkout-test', [\App\Http\Controllers\Client\CheckoutController::class, 'index'])->name('checkout.test');
+    Route::post('/checkout-test/procesar', [\App\Http\Controllers\Client\CheckoutController::class, 'procesar'])->name('checkout.test.procesar');
+    Route::post('/checkout-test/confirm-payment', [\App\Http\Controllers\Client\CheckoutController::class, 'confirmPayment'])->name('checkout.test.confirm-payment');
+    Route::get('/order-test/{id}', [\App\Http\Controllers\Client\CheckoutController::class, 'detalles'])->name('order.test.details');
+    Route::get('/order-test/{id}/pdf', [\App\Http\Controllers\Client\CheckoutController::class, 'downloadOrderPdf'])->name('order.test.pdf');
     Route::view('/example-auth','example-auth');
     Route::view('/nosotros','nosotros')->name('nosotros');
     Route::view('/contacto','contacto')->name('contacto');
@@ -51,13 +108,40 @@
     // Route::post('/carrito/eliminar/{id}', [CartController::class, 'eliminar'])->name('carrito.eliminar');
     Route::get('/categoria/{slug}', [FrontEndController::class, 'productosPorCategoria'])->name('categoria.productos');
 
+    // Stripe webhook (outside of middleware group for proper handling)
+    Route::post('/stripe/webhook', [CheckoutController::class, 'stripeWebhook'])->name('stripe.webhook');
 
-    Route::prefix('cliente')->group(function () {
-        Route::get('/checkout', [CheckoutController::class, 'index'])->name('cliente.checkout');
-        Route::post('/checkout/procesar', [CheckoutController::class, 'procesar'])->name('cliente.checkout.procesar');
-        Route::get('/checkout/mercadopago/{payment_id}', [CheckoutController::class, 'mercadoPagoCallback'])->name('cliente.checkout.mercadopago');
-        Route::get('/cliente/pedido/{id}', [CheckoutController::class, 'detalles'])->name('cliente.checkout.detalles');
-    });
+// Test route for Stripe connectivity
+Route::get('/test-stripe', function () {
+    try {
+        $stripeService = new StripeService();
+        
+        // Test creating a simple payment intent
+        $paymentIntent = $stripeService->createPaymentIntent([
+            'amount' => 100, // $1.00 in cents
+            'currency' => 'usd',
+            'automatic_payment_methods' => [
+                'enabled' => true,
+            ],
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'payment_intent_id' => $paymentIntent->id,
+            'status' => $paymentIntent->status,
+            'stripe_key' => config('stripe.key'),
+            'message' => 'Stripe connection successful!'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'stripe_key' => config('stripe.key'),
+            'message' => 'Stripe connection failed!'
+        ], 500);
+    }
+});
 
         
         // Mostrar formulario para solicitar enlace
