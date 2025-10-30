@@ -28,6 +28,7 @@ Route::prefix('cliente')->name('cliente.')->group(function () {
             Route::post('/logout', [AuthClientController::class, 'logout'])->name('logout');
             // Dentro de Route::middleware(['auth:client', 'PreventBackHistory'])->group(...)
             Route::get('/compras', [ClientController::class, 'misCompras'])->name('compras');
+            Route::get('/pedido/{id}/detalle', [ClientController::class, 'detallePedido'])->name('pedido.detalle');
             Route::get('/pedido', [ClientController::class, 'realizarPedido'])->name('pedido');
         });
 

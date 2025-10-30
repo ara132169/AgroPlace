@@ -236,7 +236,7 @@ class CheckoutController extends Controller
                 'status' => 'pendiente',
                 'payment_method' => 'stripe',
                 'stripe_payment_status' => 'pending',
-                'payment_currency' => 'EUR',
+                'payment_currency' => 'MXN',
             ]);
 
             // Create order items
@@ -259,7 +259,7 @@ class CheckoutController extends Controller
             // Create payment intent with Stripe
             $paymentIntent = $this->stripeService->createPaymentIntent([
                 'amount' => $amountInCents, // Ya está en centavos
-                'currency' => 'eur',
+                'currency' => 'mxn',
                 'payment_method' => $request->payment_method_id,
                 'confirmation_method' => 'manual',
                 'confirm' => true,

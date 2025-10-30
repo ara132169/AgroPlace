@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('payment_method')->default('stripe')->after('status');
             $table->string('stripe_payment_intent_id')->nullable()->after('payment_method');
             $table->string('stripe_payment_status')->default('pending')->after('stripe_payment_intent_id');
-            $table->string('payment_currency', 3)->default('EUR')->after('stripe_payment_status');
+            $table->string('payment_currency', 3)->default('MXN')->after('stripe_payment_status');
         });
     }
 

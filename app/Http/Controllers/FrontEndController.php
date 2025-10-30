@@ -100,6 +100,93 @@ class FrontEndController extends Controller
         ));
     }
 
+    public function productos(Request $request)
+    {
+        // Inicializar query de productos
+        $query = Product::with(['seller', 'category', 'images'])
+            ->where('visibility', 1);
+
+        // Filtro por categoría
+        if ($request->filled('categoria')) {
+            $query->where('category', $request->categoria);
+        }
+
+        // Filtro por subcategoría
+        if ($request->filled('subcategoria')) {
+            $query->where('subcategory', $request->subcategoria);
+        }
+
+        // Filtro por precio
+        if ($request->filled('precio_min')) {
+            $query->where('price', '>=', $request->precio_min);
+        }
+        if ($request->filled('precio_max')) {
+            $query->where('price', '<=', $request->precio_max);
+        }
+
+        // Filtro por vendedor
+        if ($request->filled('vendedor')) {
+            $query->where('seller_id', $request->vendedor);
+        }
+
+        // Búsqueda por texto
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('summary', 'LIKE', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Ordenamiento
+        $sortBy = $request->get('sort', 'default');
+        switch($sortBy) {
+            case 'price_low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+        }
+
+        // Paginación
+        $productos = $query->paginate(12)->withQueryString();
+
+        // Datos para filtros
+        $categorias = Category::withCount(['products' => function($query) {
+            $query->where('visibility', 1);
+        }])->orderBy('category_name')->get();
+        
+        $subcategorias = SubCategory::orderBy('subcategory_name')->get();
+        $vendedores = Seller::select('id', 'name', 'username')
+            ->orderBy('name')
+            ->get();
+
+        // Rango de precios
+        $precioMin = Product::where('visibility', 1)->min('price');
+        $precioMax = Product::where('visibility', 1)->max('price');
+
+        return view('front.layout.pages.productos.index', compact(
+            'productos', 
+            'categorias', 
+            'subcategorias', 
+            'vendedores', 
+            'precioMin', 
+            'precioMax'
+        ));
+    }
+
   
 
 

@@ -1,13 +1,12 @@
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('pageTitle')</title>
 
     <meta name="keywords" content="Marketplace " />
     <meta name="description" content="AgroPlace - venta y compra de insumos agricolas">
-    <meta name="author" content="D-THEMES">
-
-    <!-- Favicon -->
+    <meta name="author" content="D-THEMES">    <!-- Favicon -->
     @php
         $favicon = get_settings()->site_favicon ?? 'default-favicon.png';
         $faviconPath = '/images/site/' . $favicon;

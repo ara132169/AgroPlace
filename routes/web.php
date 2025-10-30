@@ -27,6 +27,7 @@
     */
 
     Route::get('/', [FrontEndController::class, 'index'])->name('inicio');
+    Route::get('/productos', [FrontEndController::class, 'productos'])->name('productos.index');
     Route::view('/example-page','example-page');
 
     // Debug routes
@@ -119,7 +120,7 @@ Route::get('/test-stripe', function () {
         // Test creating a simple payment intent
         $paymentIntent = $stripeService->createPaymentIntent([
             'amount' => 100, // $1.00 in cents
-            'currency' => 'usd',
+            'currency' => 'mxn',
             'automatic_payment_methods' => [
                 'enabled' => true,
             ],
