@@ -44,11 +44,17 @@ class CartController extends Controller
     
         $cartCount = collect($cart)->sum('quantity');
     
-        return response()->json([
-            'success' => true,
-            'cartCount' => $cartCount,
-            'message' => 'Producto agregado al carrito'
-        ]);
+        // Si es una petición AJAX, devolver JSON
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'cartCount' => $cartCount,
+                'message' => 'Producto agregado al carrito'
+            ]);
+        }
+        
+        // Si es un formulario normal, redirigir de vuelta con mensaje
+        return redirect()->back()->with('success', 'Producto agregado al carrito exitosamente');
     }
     
 

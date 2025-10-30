@@ -26,15 +26,15 @@
                         <a href="my-account.html" class="d-lg-show">Mi Cuenta</a>
                             
                         @auth('client')
-                        <span class="d-lg-show login">
+                        <a href="{{ route('cliente.panel') }}" class="d-lg-show login" style="text-decoration: none; color: inherit;">
                             <i class="w-icon-account"></i>Bienvenido, {{ Auth::guard('client')->user()->name }}
-                        </span>
+                        </a>
                         @endauth
 
                         @auth('seller')
-                            <span class="d-lg-show login">
+                            <a href="{{ route('tienda.home') }}" class="d-lg-show login" style="text-decoration: none; color: inherit;">
                                 <i class="w-icon-user"></i>Bienvenido, {{ Auth::guard('seller')->user()->name }}
-                            </span>
+                            </a>
                         @endauth
 
                         @guest('client')
@@ -89,71 +89,73 @@
                         </div>
                        
                        
-                        <div class="dropdown cart-dropdown cart-offcanvas mr-0 mr-lg-2">
-                            <div class="cart-overlay"></div>
-                            <a href="{{ route('cliente.carrito') }}" class="cart-toggle label-down link">
-                                <i class="w-icon-cart">
-                                    <span class="cart-count">
-                                        {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}
-                                    </span>
-                                </i>
-                                <span class="cart-label">Carrito</span>
-                            </a>
-                            <div class="dropdown-box">
-                                <div class="cart-header">
-                                    <span>Productos Agregados</span>
-                                    <a href="#" class="btn-close">Cerrar<i class="w-icon-long-arrow-right"></i></a>
-                                </div>
+                         <div class="dropdown cart-dropdown cart-offcanvas mr-0 mr-lg-2">
+                    <div class="cart-overlay"></div>
+                    <a href="{{ route('cliente.carrito') }}" class="cart-toggle label-down link">
+                        <i class="w-icon-cart">
+                        <span class="cart-count" id="cart-count">
 
-                                @php
-                                    $cartItems = session('cart', []);
-                                    $subtotal = collect($cartItems)->sum(function ($item) {
-                                        return $item['price'] * $item['quantity'];
-                                    });
-                                @endphp
+                                {{ session('cart') ? collect(session('cart'))->sum('quantity') : 0 }}
+                            </span>
+                        </i>
+                        <span class="cart-label">Carrito</span>
+                    </a>
+                    <div class="dropdown-box">
+                        <div class="cart-header">
+                            <span>Productos Agregados</span>
+                            <a href="#" class="btn-close">Cerrar<i class="w-icon-long-arrow-right"></i></a>
+                        </div>
 
-                                <div class="products">
-                                    @forelse($cartItems as $id => $item)
-                                        <div class="product product-cart">
-                                            <div class="product-detail">
-                                                <a href="#" class="product-name">
-                                                    {{ Str::limit($item['name'], 35) }}
-                                                </a>
-                                                <div class="price-box">
-                                                    <span class="product-quantity">{{ $item['quantity'] }}</span>
-                                                    <span class="product-price">
-                                                        ${{ number_format($item['price'], 2) }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <figure class="product-media">
-                                                <a href="#">
-                                                <img src="{{ asset('images/products/' . ($item['image'] ?? 'default.jpg')) }}" alt="{{ $item['name'] }}" width="84" height="94" />
-                                                </a>
-                                            </figure>
-                                            <form method="POST" action="{{ route('cliente.carrito.eliminar', $id) }}">
-                                                @csrf
-                                                
-                                                <button class="btn btn-link btn-close" aria-label="button">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
+                        @php
+                            $cartItems = session('cart', []);
+                            $subtotal = collect($cartItems)->sum(function ($item) {
+                                return $item['price'] * $item['quantity'];
+                            });
+                        @endphp
+
+                        <div class="products">
+                            @forelse($cartItems as $id => $item)
+                                <div class="product product-cart">
+                                    <div class="product-detail">
+                                        <a href="#" class="product-name">
+                                            {{ Str::limit($item['name'], 35) }}
+                                        </a>
+                                        <div class="price-box">
+                                            <span class="product-quantity">{{ $item['quantity'] }}</span>
+                                            <span class="product-price">
+                                                ${{ number_format($item['price'], 2) }}
+                                            </span>
                                         </div>
-                                    @empty
-                                        <p class="text-center">Tu carrito está vacío.</p>
-                                    @endforelse
+                                    </div>
+                                    <figure class="product-media">
+                                        <a href="#">
+                                        <img src="{{ asset('images/products/' . ($item['image'] ?? 'default.jpg')) }}" alt="{{ $item['name'] }}" width="84" height="94" />
+                                        </a>
+                                    </figure>
+                                    <form method="POST" action="">
+                                       
+                                        <button class="btn btn-link btn-close"  aria-label="button">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
                                 </div>
+                            @empty
+                                <p class="text-center">Tu carrito está vacío.</p>
+                            @endforelse
+                        </div>
 
-                                <div class="cart-total">
-                                    <label>Subtotal:</label>
-                                    <span class="price">${{ number_format($subtotal, 2) }}</span>
-                                </div>
+                        <div class="cart-total">
+                            <label>Subtotal:</label>
+                            <span class="price">${{ number_format($subtotal, 2) }}</span>
+                        </div>
 
-                                <div class="cart-action">
-                                    <a href="{{ route('cliente.carrito') }}" class="btn btn-dark btn-outline btn-rounded">Ver Carrito</a>
-                                    <a href="{{ route('cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
-                                </div>
-                            </div>
+                        <div class="cart-action">
+                            <a href="{{ route('cliente.carrito') }}" class="btn btn-dark btn-outline btn-rounded">Ver Carrito</a>
+                            <a href="{{ route('cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
+
+                        </div>
+                    </div>
+    </div>
                       
 
 
@@ -219,41 +221,26 @@
                                     <li class="{{request()->routeIs('inicio') ? 'active' : ''}}">
                                         <a href="{{ url('/') }}">Inicio</a>
                                     </li>
-                                    <li>
-                                        <a href="shop-banner-sidebar.html">Productos</a>
+                                    <li class="{{request()->routeIs('productos.*') ? 'active' : ''}}">
+                                        <a href="{{ route('productos.index') }}">Productos</a>
 
                                         <!-- Start of Megamenu -->
                                          
-                                        <ul class="megamenu">
-                                       
-                                            <li>
-                                                <h4 class="menu-title">Maquinaria Agrícola</h4>
-                                                <ul>
-                                                    <li><a href="shop-banner-sidebar.html">Implementos Agrícolas</a></li>
-                                                    <li><a href="shop-boxed-banner.html">Sembradoras</a></li>
-                                                    <li><a href="shop-fullwidth-banner.html">Pulverizadoras</a></li>
-                                                    <li><a href="shop-horizontal-filter.html">Fertilizadoras</a></li>
-                                                    
-                                                </ul>
-                                            </li>
-                                         
-                                           
-                                        </ul>
-                                        <!-- End of Megamenu -->
+                                        
                                     </li>
-                                    <li>
+                                    <li class="{{request()->routeIs('tiendas.*') ? 'active' : ''}}">
                                         <a href="{{ route('tiendas.index') }}">Tiendas</a>
                                        
                                     </li>
-                                    <li>
+                                    <li class="{{request()->is('blog*') ? 'active' : ''}}">
                                         <a href="blog-mask-grid.html">Blog</a>
                                         
                                     </li>
-                                    <li>
+                                    <li class="{{request()->is('nosotros*') ? 'active' : ''}}">
                                         <a href="{{ url('nosotros') }}">Nosotros</a>
                                         
                                     </li>
-                                    <li>
+                                    <li class="{{request()->is('contacto*') ? 'active' : ''}}">
                                         <a href="{{ url('contacto') }}">Contacto</a>
                                         
                                     </li>

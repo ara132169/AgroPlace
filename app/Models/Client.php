@@ -60,4 +60,28 @@ class Client extends Authenticatable
     {
         $this->notify(new ClientResetPasswordNotification($token));
     }
+
+    /**
+     * Relación con las órdenes del cliente
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Relación con los elementos del carrito
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    /**
+     * Relación con la lista de deseos (si existe)
+     */
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
 }

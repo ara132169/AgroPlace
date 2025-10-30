@@ -207,26 +207,26 @@
                                     <li class="{{request()->routeIs('inicio') ? 'active' : ''}}">
                                         <a href="{{ url('/') }}">Inicio</a>
                                     </li>
-                                    <li>
-                                        <a href="">Productos</a>
+                                    <li class="{{request()->routeIs('productos.*') ? 'active' : ''}}">
+                                        <a href="{{ route('productos.index') }}">Productos</a>
 
                                         <!-- Start of Megamenu -->
                                          
                                         
                                     </li>
-                                    <li>
+                                    <li class="{{request()->routeIs('tiendas.*') ? 'active' : ''}}">
                                         <a href="{{ route('tiendas.index') }}">Tiendas</a>
                                        
                                     </li>
-                                    <li>
+                                    <li class="{{request()->is('blog*') ? 'active' : ''}}">
                                         <a href="blog-mask-grid.html">Blog</a>
                                         
                                     </li>
-                                    <li>
+                                    <li class="{{request()->is('nosotros*') ? 'active' : ''}}">
                                         <a href="{{ url('nosotros') }}">Nosotros</a>
                                         
                                     </li>
-                                    <li>
+                                    <li class="{{request()->is('contacto*') ? 'active' : ''}}">
                                         <a href="{{ url('contacto') }}">Contacto</a>
                                         
                                     </li>

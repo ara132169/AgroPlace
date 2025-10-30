@@ -30,8 +30,22 @@ class ClientController extends Controller
     public function misCompras()
     {
         $client = auth()->guard('client')->user();
-        $compras = $client->orders()->latest()->get(); // Asumiendo relación definida
+        $compras = $client->orders()
+            ->withCount('items')
+            ->latest()
+            ->get();
+        
         return view('back.pages.cliente.compras.compras', compact('compras'));
+    }
+
+    public function detallePedido($id)
+    {
+        $client = auth()->guard('client')->user();
+        $order = $client->orders()
+            ->with(['items.product', 'items'])
+            ->findOrFail($id);
+        
+        return view('back.pages.cliente.compras.detalle-pedido', compact('order'));
     }
 
     public function wishlist()

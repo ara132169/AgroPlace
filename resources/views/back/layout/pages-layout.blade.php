@@ -541,13 +541,13 @@
 						</li>
 					@else
 						<li>
-							<a href="" class="dropdown-toggle no-arrow {{ Route::is('cliente.home') ? 'active' : '' }}">
+							<a href="{{ route('cliente.panel') }}" class="dropdown-toggle no-arrow {{ Route::is('cliente.panel') ? 'active' : '' }}">
 								<span class="micon fa fa-home"></span
 								><span class="mtext">Inicio</span>
 							</a>
 						</li>
 						<li>
-							<a href="invoice.html" class="dropdown-toggle no-arrow">
+							<a href="{{ route('cliente.compras') }}" class="dropdown-toggle no-arrow {{ Route::is('cliente.compras') ? 'active' : '' }}">
 								<span class="micon bi bi-receipt-cutoff"></span
 								><span class="mtext">Pedidos</span>
 							</a>
@@ -556,12 +556,12 @@
 							<div class="dropdown-divider"></div>
 						</li>
 						<li>
-							<div class="sidebar-small-cap">Configuración</div>
+							<div class="sidebar-small-cap">CONFIGURACIÓN</div>
 						</li>
 					
 						<li>
 							<a
-								href="{{route('tienda.perfil')}}" class="dropdown-toggle no-arrow {{Route::is('tienda.perfil') ? 'active' : ''}}" >
+								href="{{ route('cliente.perfil') }}" class="dropdown-toggle no-arrow {{ Route::is('cliente.perfil') ? 'active' : '' }}" >
 								<span class="micon fa fa-user"></span>
 								<span class="mtext"
 									>Perfil
