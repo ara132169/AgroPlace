@@ -151,7 +151,7 @@
         }
         
         .status-paid {
-            background-color: #28a745;
+            background-color: #2563eb;
         }
         
         .status-pending {

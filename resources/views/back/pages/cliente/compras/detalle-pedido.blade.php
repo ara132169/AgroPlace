@@ -120,7 +120,7 @@
 
     .price-cell {
         font-weight: 600;
-        color: #28a745;
+        color: #2563eb;
         font-size: 16px;
     }
 

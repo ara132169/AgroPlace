@@ -40,7 +40,9 @@ Route::prefix('admin')->name('admin.')->group(function(){
             Route::post('/change-favicon',[AdminController::class,'changeFavicon'])->name('change-favicon');
             Route::post('/change-banner', [AdminController::class, 'changeBanner'])->name('change-banner');
 
-
+            // RUTAS PARA VENTAS
+            Route::get('/ventas', [AdminController::class, 'todasLasVentas'])->name('ventas');
+            Route::get('/venta/{orderId}/detalle', [AdminController::class, 'detalleVentaAdmin'])->name('venta.detalle');
 
            
             

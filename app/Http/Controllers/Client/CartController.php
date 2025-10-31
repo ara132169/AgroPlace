@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    // Mostrar carrito
+    // Mostrar carrito usando sesiones (accesible para todos)
     public function showCart()
     {
-        $cartItems = Cart::where('client_id', auth()->id())->with('product')->get();
+        $cartItems = session('cart', []);
         return view('back.pages.cliente.compras.carrito', compact('cartItems'));
     }
 

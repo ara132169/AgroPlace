@@ -141,8 +141,11 @@
 
                         <div class="cart-action">
                             <a href="{{ route('cliente.carrito') }}" class="btn btn-dark btn-outline btn-rounded">Ver Carrito</a>
-                            <a href="{{ route('cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
-
+                            @if(auth('client')->check() || auth('seller')->check())
+                                <a href="{{ route('cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
+                            @else
+                                <a href="{{ route('cliente.checkout') }}" class="btn btn-primary btn-rounded">Finalizar Compra</a>
+                            @endif
                         </div>
                     </div>
     </div>

@@ -5,7 +5,7 @@
 <style>
 .order-success {
     background: #e8f5e8;
-    border: 2px solid #28a745;
+    border: 2px solid #2563eb;
     border-radius: 10px;
     padding: 2rem;
     margin: 2rem 0;
@@ -14,7 +14,7 @@
 
 .order-success i {
     font-size: 3rem;
-    color: #28a745;
+    color: #2563eb;
     display: block;
     margin-bottom: 1rem;
 }
@@ -84,7 +84,7 @@
 .order-table .total td {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #28a745;
+    color: #2563eb;
 }
 
 .address-table {
@@ -111,7 +111,7 @@
 }
 
 .title-underline {
-    border-bottom: 2px solid #28a745;
+    border-bottom: 2px solid #2563eb;
     padding-bottom: 0.5rem;
     margin-bottom: 1.5rem;
 }

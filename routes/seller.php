@@ -34,6 +34,10 @@ Route::prefix('tienda')->name('tienda.')->group(function(){
            Route::get('/ventas', 'misVentas')->name('ventas');
            Route::get('/venta/{orderId}/detalle', 'detalleVenta')->name('venta.detalle');
 
+           // Rutas para compras del vendedor
+           Route::get('/compras', 'misCompras')->name('compras');
+           Route::get('/compra/{orderId}/detalle', 'detalleCompra')->name('compra.detalle');
+
         });
 
         Route::prefix('product')->name('product.')->group(function(){
@@ -52,6 +56,24 @@ Route::prefix('tienda')->name('tienda.')->group(function(){
                Route::get('/get-category-subcategories','getSubcategories')->name('get-product-subcategory');
             });
         });
+    });
+
+    // Rutas del carrito y checkout para vendedores (sin autenticación requerida para carrito)
+    Route::controller(\App\Http\Controllers\Client\CartController::class)->group(function () {
+        Route::get('/carrito', 'showCart')->name('carrito');
+        Route::post('/carrito/agregar/{producto}', 'agregar')->name('carrito.agregar');
+        Route::post('/carrito/eliminar', 'removeFromCart')->name('carrito.eliminar');
+        Route::post('/carrito/actualizar', 'updateCart')->name('carrito.actualizar');
+    });
+
+    // Rutas de checkout para vendedores autenticados
+    Route::controller(\App\Http\Controllers\Client\CheckoutController::class)->group(function () {
+        Route::get('/checkout', 'index')->name('checkout');
+        Route::post('/checkout/procesar', 'procesar')->name('checkout.procesar');
+        Route::post('/checkout/confirm-payment', 'confirmPayment')->name('checkout.confirm-payment');
+        Route::get('/checkout/mercadopago/{payment_id}', 'mercadoPagoCallback')->name('checkout.mercadopago');
+        Route::get('/pedido/{id}', 'detalles')->name('checkout.detalles');
+        Route::get('/pedido/{id}/pdf', 'downloadOrderPdf')->name('checkout.pdf');
     });
 
  

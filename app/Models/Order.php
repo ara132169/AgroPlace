@@ -10,6 +10,8 @@ class Order extends Model
 {
     protected $fillable = [
         'client_id',
+        'seller_id',
+        'buyer_type',
         'shipping_name',
         'shipping_address',
         'shipping_company',
@@ -31,6 +33,20 @@ class Order extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function seller()
+    {
+        return $this->belongsTo(Seller::class);
+    }
+
+    public function buyer()
+    {
+        if ($this->buyer_type === 'client') {
+            return $this->client();
+        } else {
+            return $this->seller();
+        }
     }
 
     public function items()

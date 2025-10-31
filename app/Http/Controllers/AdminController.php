@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Carbon;
 use Illuminate\Support\Facades\File;
 use App\Models\GeneralSetting;
 use App\Models\Seller;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Client;
 use App\Notifications\VendedorAprobado;
 use App\Notifications\NuevoVendedorNotificado;
 use Illuminate\Support\Facades\Notification;
@@ -397,7 +401,194 @@ class AdminController extends Controller
 
 
 
-    
+    public function todasLasVentas(Request $request)
+    {
+        // Construir la consulta base
+        $query = DB::table('orders')
+            ->leftJoin('clients', function($join) {
+                $join->on('orders.client_id', '=', 'clients.id')
+                     ->where('orders.buyer_type', '=', 'client');
+            })
+            ->leftJoin('sellers as buyer_sellers', function($join) {
+                $join->on('orders.seller_id', '=', 'buyer_sellers.id')
+                     ->where('orders.buyer_type', '=', 'seller');
+            })
+            ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
+            ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id');
+
+        // Aplicar filtros de búsqueda
+        if ($request->filled('search')) {
+            $search = '%' . $request->search . '%';
+            $query->where(function($q) use ($search) {
+                $q->where('orders.id', 'like', $search)
+                  ->orWhere('clients.name', 'like', $search)
+                  ->orWhere('clients.email', 'like', $search)
+                  ->orWhere('buyer_sellers.name', 'like', $search)
+                  ->orWhere('buyer_sellers.email', 'like', $search)
+                  ->orWhere('sellers.name', 'like', $search);
+            });
+        }
+
+        // Filtro por número de orden específico
+        if ($request->filled('order_id')) {
+            $query->where('orders.id', $request->order_id);
+        }
+
+        // Filtro por vendedor
+        if ($request->filled('seller_filter')) {
+            $query->where('sellers.name', 'like', '%' . $request->seller_filter . '%');
+        }
+
+        // Filtro por comprador
+        if ($request->filled('buyer_filter')) {
+            $query->where(function($q) use ($request) {
+                $buyer = '%' . $request->buyer_filter . '%';
+                $q->where('clients.name', 'like', $buyer)
+                  ->orWhere('buyer_sellers.name', 'like', $buyer);
+            });
+        }
+
+        // Filtro por tipo de comprador
+        if ($request->filled('buyer_type')) {
+            $query->where('orders.buyer_type', $request->buyer_type);
+        }
+
+        // Filtro por estado
+        if ($request->filled('status')) {
+            $query->where('orders.status', $request->status);
+        }
+
+        // Filtro por rango de fechas
+        if ($request->filled('date_from')) {
+            $query->whereDate('orders.created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('orders.created_at', '<=', $request->date_to);
+        }
+
+        // Obtener todas las órdenes con filtros aplicados
+        $ventas = $query->select(
+                'orders.id',
+                'orders.created_at',
+                'orders.status',
+                'orders.total',
+                'orders.buyer_type',
+                'orders.shipping_address',
+                'orders.shipping_phone',
+                DB::raw('CASE 
+                    WHEN orders.buyer_type = "client" THEN clients.name 
+                    WHEN orders.buyer_type = "seller" THEN buyer_sellers.name 
+                    ELSE "Comprador desconocido" 
+                END as client_name'),
+                DB::raw('CASE 
+                    WHEN orders.buyer_type = "client" THEN clients.email 
+                    WHEN orders.buyer_type = "seller" THEN buyer_sellers.email 
+                    ELSE "No especificado" 
+                END as client_email'),
+                DB::raw('CASE 
+                    WHEN orders.buyer_type = "client" THEN clients.phone 
+                    WHEN orders.buyer_type = "seller" THEN buyer_sellers.phone 
+                    ELSE NULL 
+                END as client_phone'),
+                DB::raw('COUNT(order_items.id) as items_count'),
+                DB::raw('GROUP_CONCAT(DISTINCT sellers.name) as vendedores'),
+                DB::raw('GROUP_CONCAT(DISTINCT sellers.id) as seller_ids')
+            )
+            ->groupBy(
+                'orders.id',
+                'orders.created_at',
+                'orders.status',
+                'orders.total',
+                'orders.buyer_type',
+                'orders.shipping_address',
+                'orders.shipping_phone',
+                'clients.name',
+                'clients.email',
+                'clients.phone',
+                'buyer_sellers.name',
+                'buyer_sellers.email',
+                'buyer_sellers.phone'
+            )
+            ->orderBy('orders.created_at', 'desc')
+            ->paginate(15)
+            ->appends($request->query());
+
+        return view('back.pages.admin.ventas.todas-ventas', compact('ventas'));
+    }
+
+    public function detalleVentaAdmin($orderId)
+    {
+        // Obtener la orden con todas sus relaciones (clientes y vendedores como compradores)
+        $order = DB::table('orders')
+            ->leftJoin('clients', function($join) {
+                $join->on('orders.client_id', '=', 'clients.id')
+                     ->where('orders.buyer_type', '=', 'client');
+            })
+            ->leftJoin('sellers as buyer_sellers', function($join) {
+                $join->on('orders.seller_id', '=', 'buyer_sellers.id')
+                     ->where('orders.buyer_type', '=', 'seller');
+            })
+            ->select(
+                'orders.*',
+                DB::raw('CASE 
+                    WHEN orders.buyer_type = "client" THEN clients.name 
+                    WHEN orders.buyer_type = "seller" THEN buyer_sellers.name 
+                    ELSE "Comprador desconocido" 
+                END as client_name'),
+                DB::raw('CASE 
+                    WHEN orders.buyer_type = "client" THEN clients.email 
+                    WHEN orders.buyer_type = "seller" THEN buyer_sellers.email 
+                    ELSE "No especificado" 
+                END as client_email'),
+                DB::raw('CASE 
+                    WHEN orders.buyer_type = "client" THEN clients.phone 
+                    WHEN orders.buyer_type = "seller" THEN buyer_sellers.phone 
+                    ELSE NULL 
+                END as client_phone'),
+                DB::raw('CASE 
+                    WHEN orders.buyer_type = "client" THEN clients.address 
+                    WHEN orders.buyer_type = "seller" THEN buyer_sellers.address 
+                    ELSE NULL 
+                END as client_address')
+            )
+            ->where('orders.id', $orderId)
+            ->first();
+
+        if (!$order) {
+            return redirect()->route('admin.ventas')->with('error', 'Venta no encontrada');
+        }
+
+        // Obtener los items de la orden con información del vendedor
+        $orderItems = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('sellers', 'products.seller_id', '=', 'sellers.id')
+            ->select(
+                'order_items.*',
+                'products.name as product_name',
+                'products.product_image',
+                'sellers.name as seller_name',
+                'sellers.email as seller_email',
+                'sellers.phone as seller_phone'
+            )
+            ->where('order_items.order_id', $orderId)
+            ->get();
+
+        // Calcular totales por vendedor
+        $totalesPorVendedor = $orderItems->groupBy('seller_name')->map(function ($items) {
+            return [
+                'vendedor' => $items->first()->seller_name,
+                'email' => $items->first()->seller_email,
+                'phone' => $items->first()->seller_phone,
+                'productos' => $items->count(),
+                'total' => $items->sum(function ($item) {
+                    return $item->price * $item->quantity;
+                })
+            ];
+        });
+
+        return view('back.pages.admin.ventas.detalle-venta', compact('order', 'orderItems', 'totalesPorVendedor'));
+    }
 
 
     

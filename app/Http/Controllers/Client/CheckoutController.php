@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Stripe\Exception\CardException;
+use Stripe\Exception\RateLimitException;
+use Stripe\Exception\InvalidRequestException;
+use Stripe\Exception\AuthenticationException;
+use Stripe\Exception\ApiConnectionException;
+use Stripe\Exception\ApiErrorException;
 
 class CheckoutController extends Controller
 {
@@ -24,7 +30,19 @@ class CheckoutController extends Controller
 
     public function index()
     {
+        // Verificar si está autenticado como cliente o vendedor
+        if (!Auth::guard('client')->check() && !Auth::guard('seller')->check()) {
+            // Si no está autenticado, redirigir al login con mensaje
+            session()->put('checkout_redirect', true);
+            return redirect()->route('cliente.ingresar')->with('info', 'Por favor inicia sesión para finalizar tu compra.');
+        }
+
         $cartItems = session('cart', []);
+
+        // Verificar que el carrito no esté vacío
+        if (empty($cartItems)) {
+            return redirect()->route('cliente.carrito')->with('error', 'Tu carrito está vacío.');
+        }
 
         // Calcular el subtotal
         $subtotal = collect($cartItems)->sum(function ($item) {
@@ -220,9 +238,26 @@ class CheckoutController extends Controller
             $totalAmount = collect($cartItems)->sum(fn($item) => $item['price'] * $item['quantity']);
             $amountInCents = (int) ($totalAmount * 100);
 
+            // Determinar el tipo de usuario y obtener el ID
+            $clientId = null;
+            $sellerId = null;
+            $buyerType = 'client';
+
+            if (Auth::guard('client')->check()) {
+                $clientId = Auth::guard('client')->id();
+                $buyerType = 'client';
+            } elseif (Auth::guard('seller')->check()) {
+                $sellerId = Auth::guard('seller')->id();
+                $buyerType = 'seller';
+            } else {
+                throw new \Exception('Usuario no autenticado');
+            }
+
             // Create the order first
             $order = Order::create([
-                'client_id' => auth('client')->id() ?? 1, // Usar ID 1 como fallback para pruebas
+                'client_id' => $clientId,
+                'seller_id' => $sellerId,
+                'buyer_type' => $buyerType,
                 'shipping_name' => $request->shipping_name . ' ' . $request->surname,
                 'shipping_address' => $request->address,
                 'shipping_company' => $request->company ?? '', // Usar string vacío si no se proporciona
@@ -340,9 +375,100 @@ class CheckoutController extends Controller
                 return redirect()->back()->with('error', 'El pago no pudo ser procesado. Inténtalo de nuevo.');
             }
 
+        } catch (\Stripe\Exception\CardException $e) {
+            // Error específico de la tarjeta (fondos insuficientes, tarjeta declinada, etc.)
+            DB::rollback();
+            $error = $e->getError();
+            $errorMessage = $this->getStripeErrorMessage($error->code, $error->message);
+            
+            Log::warning('Stripe Card Exception: ' . $e->getMessage(), [
+                'error_code' => $error->code,
+                'error_type' => $error->type,
+                'decline_code' => $error->decline_code ?? null,
+            ]);
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage
+                ], 400);
+            }
+            
+            return redirect()->back()->with('error', $errorMessage);
+            
+        } catch (\Stripe\Exception\RateLimitException $e) {
+            // Demasiadas peticiones a la API
+            DB::rollback();
+            Log::error('Stripe Rate Limit Exception: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Demasiadas peticiones. Por favor, inténtalo en unos momentos.'
+                ], 429);
+            }
+            
+            return redirect()->back()->with('error', 'Demasiadas peticiones. Por favor, inténtalo en unos momentos.');
+            
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+            // Parámetros inválidos
+            DB::rollback();
+            Log::error('Stripe Invalid Request Exception: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error en la configuración del pago. Contacta al soporte.'
+                ], 400);
+            }
+            
+            return redirect()->back()->with('error', 'Error en la configuración del pago. Contacta al soporte.');
+            
+        } catch (\Stripe\Exception\AuthenticationException $e) {
+            // Error de autenticación con Stripe
+            DB::rollback();
+            Log::error('Stripe Authentication Exception: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de autenticación con el procesador de pagos.'
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Error de autenticación con el procesador de pagos.');
+            
+        } catch (\Stripe\Exception\ApiConnectionException $e) {
+            // Error de conexión con Stripe
+            DB::rollback();
+            Log::error('Stripe API Connection Exception: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de conexión con el procesador de pagos. Inténtalo más tarde.'
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Error de conexión con el procesador de pagos. Inténtalo más tarde.');
+            
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            // Error general de la API de Stripe
+            DB::rollback();
+            Log::error('Stripe API Error Exception: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error del procesador de pagos. Inténtalo más tarde.'
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Error del procesador de pagos. Inténtalo más tarde.');
+            
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Stripe payment error: ' . $e->getMessage());
+            Log::error('General payment error: ' . $e->getMessage());
             
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -437,6 +563,36 @@ class CheckoutController extends Controller
         // }
 
         return view('front.layout.pages.cliente.order-details', compact('order'));
+    }
+
+    /**
+     * Mapear códigos de error de Stripe a mensajes en español amigables
+     */
+    private function getStripeErrorMessage($errorCode, $originalMessage)
+    {
+        $errorMessages = [
+            // Errores de tarjeta
+            'card_declined' => 'Tu tarjeta fue rechazada. Por favor, intenta con otra tarjeta o contacta tu banco.',
+            'insufficient_funds' => 'Fondos insuficientes en tu tarjeta. Por favor, verifica tu saldo o usa otra tarjeta.',
+            'incorrect_cvc' => 'El código CVV/CVC es incorrecto. Por favor, verifica e intenta nuevamente.',
+            'expired_card' => 'Tu tarjeta ha expirado. Por favor, usa una tarjeta válida.',
+            'incorrect_number' => 'El número de tarjeta es incorrecto. Por favor, verifica e intenta nuevamente.',
+            'incorrect_zip' => 'El código postal no coincide con tu tarjeta.',
+            'processing_error' => 'Error al procesar tu tarjeta. Por favor, intenta nuevamente.',
+            'generic_decline' => 'Tu tarjeta fue rechazada. Contacta tu banco para más información.',
+            
+            // Errores de límites
+            'amount_too_large' => 'El monto es demasiado alto para ser procesado.',
+            'amount_too_small' => 'El monto es demasiado pequeño para ser procesado.',
+            
+            // Errores de autenticación
+            'authentication_required' => 'Tu banco requiere autenticación adicional. Por favor, intenta nuevamente.',
+            
+            // Errores de rate limit
+            'rate_limit' => 'Demasiadas peticiones. Por favor, espera un momento e intenta nuevamente.',
+        ];
+
+        return $errorMessages[$errorCode] ?? $originalMessage ?? 'Ha ocurrido un error al procesar tu pago. Por favor, intenta nuevamente.';
     }
 
     // Stripe webhook handler

@@ -32,23 +32,29 @@ Route::prefix('cliente')->name('cliente.')->group(function () {
             Route::get('/pedido', [ClientController::class, 'realizarPedido'])->name('pedido');
         });
 
-        Route::controller(CheckoutController::class)->group(function () {
-            Route::get('/checkout', 'index')->name('checkout');
-            Route::post('/checkout/procesar', 'procesar')->name('checkout.procesar');
-            Route::post('/checkout/confirm-payment', 'confirmPayment')->name('checkout.confirm-payment');
-            Route::get('/checkout/mercadopago/{payment_id}', 'mercadoPagoCallback')->name('checkout.mercadopago');
-            Route::get('/pedido/{id}', 'detalles')->name('checkout.detalles');
-            Route::get('/pedido/{id}/pdf', 'downloadOrderPdf')->name('checkout.pdf');
-        });
+
+    });
+
+    // Rutas del carrito accesibles para todos (cliente, vendedor, invitado)
+    Route::controller(CartController::class)->group(function () {
+        Route::get('/carrito', 'showCart')->name('carrito');
+        Route::post('/carrito/agregar/{producto}', 'agregar')->name('carrito.agregar');
+        Route::get('/cliente/carrito','ver')->name('cliente.carrito');
+        Route::post('/carrito/eliminar', 'removeFromCart')->name('carrito.eliminar');
+        Route::post('/carrito/actualizar', 'updateCart')->name('carrito.actualizar');
+    });
+
+    // Rutas de checkout accesibles para clientes y vendedores autenticados
+    Route::controller(CheckoutController::class)->group(function () {
+        Route::get('/checkout', 'index')->name('checkout');
+        Route::post('/checkout/procesar', 'procesar')->name('checkout.procesar');
+        Route::post('/checkout/confirm-payment', 'confirmPayment')->name('checkout.confirm-payment');
+        Route::get('/checkout/mercadopago/{payment_id}', 'mercadoPagoCallback')->name('checkout.mercadopago');
+        Route::get('/pedido/{id}', 'detalles')->name('checkout.detalles');
+        Route::get('/pedido/{id}/pdf', 'downloadOrderPdf')->name('checkout.pdf');
     });
 
     Route::middleware(['auth:client', 'PreventBackHistory'])->group(function () {
-        Route::controller(CartController::class)->group(function () {
-            Route::get('/carrito', 'showCart')->name('carrito');
-            Route::post('/carrito/agregar/{producto}', 'agregar')->name('carrito.agregar');
-            Route::get('/cliente/carrito','ver')->name('cliente.carrito');
-            Route::post('/carrito/eliminar', 'removeFromCart')->name('carrito.eliminar');
-            Route::post('/carrito/actualizar', 'updateCart')->name('carrito.actualizar');
-        });
+        
     });
 });

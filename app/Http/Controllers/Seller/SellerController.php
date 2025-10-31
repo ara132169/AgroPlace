@@ -8,7 +8,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Seller;
+use App\Models\Client;
 use App\Models\VerificationToken; 
 use Illuminate\Support\Facades\File;
 use SawaStacks\Utils\Kropify;
@@ -338,7 +340,94 @@ class SellerController extends Controller
 
  
 
-    
+        /**
+     * Mostrar todas las compras realizadas por el vendedor
+     */
+    public function misCompras()
+    {
+        $seller = Auth::guard('seller')->user();
+        
+        // Obtener las compras del vendedor directamente usando seller_id
+        $compras = Order::where('orders.seller_id', $seller->id)
+            ->where('orders.buyer_type', 'seller')
+            ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
+            ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
+            ->select(
+                'orders.id',
+                'orders.created_at',
+                'orders.status',
+                'orders.total',
+                'orders.shipping_address',
+                'orders.shipping_phone',
+                DB::raw('COUNT(DISTINCT order_items.id) as items_count'),
+                DB::raw('GROUP_CONCAT(DISTINCT sellers.name) as vendedores'),
+                DB::raw('GROUP_CONCAT(DISTINCT sellers.id) as seller_ids')
+            )
+            ->groupBy(
+                'orders.id',
+                'orders.created_at',
+                'orders.status',
+                'orders.total',
+                'orders.shipping_address',
+                'orders.shipping_phone'
+            )
+            ->orderBy('orders.created_at', 'desc')
+            ->paginate(10);
+        
+        return view('back.pages.tienda.compras.mis-compras', [
+            'compras' => $compras,
+            'sinRegistro' => false
+        ]);
+    }
+
+    /**
+     * Mostrar detalle de una compra específica del vendedor
+     */
+    public function detalleCompra($orderId)
+    {
+        $seller = Auth::guard('seller')->user();
+        
+        // Verificar que la orden pertenece al vendedor
+        $order = Order::where('orders.id', $orderId)
+            ->where('orders.seller_id', $seller->id)
+            ->where('orders.buyer_type', 'seller')
+            ->first();
+        
+        if (!$order) {
+            return redirect()->route('tienda.compras')->with('error', 'Compra no encontrada');
+        }
+        
+        // Obtener los items de la orden con información del vendedor y producto
+        $orderItems = OrderItem::where('order_items.order_id', $orderId)
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('sellers', 'products.seller_id', '=', 'sellers.id')
+            ->select(
+                'order_items.*',
+                'products.name as product_name',
+                'products.product_image as product_image',
+                'sellers.name as seller_name',
+                'sellers.email as seller_email',
+                'sellers.phone as seller_phone'
+            )
+            ->get();
+        
+        // Calcular totales por vendedor
+        $totalesPorVendedor = $orderItems->groupBy('seller_name')->map(function ($items) {
+            $firstItem = $items->first();
+            return [
+                'vendedor' => $firstItem->seller_name,
+                'email' => $firstItem->seller_email,
+                'phone' => $firstItem->seller_phone,
+                'productos' => $items->count(),
+                'total' => $items->sum(function($item) {
+                    return $item->price * $item->quantity;
+                })
+            ];
+        })->values();
+        
+        return view('back.pages.tienda.compras.detalle-compra', compact('order', 'orderItems', 'totalesPorVendedor'));
+    }
 
 
 }
