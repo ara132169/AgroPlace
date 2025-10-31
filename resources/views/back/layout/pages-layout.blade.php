@@ -503,6 +503,13 @@
 							</a>
 						</li>
 
+						<li>
+							<a href="{{ route('tienda.ventas') }}" class="dropdown-toggle no-arrow {{ Route::is('tienda.ventas') || Route::is('tienda.venta.detalle') ? 'active' : '' }}">
+								<span class="micon bi bi-graph-up"></span
+								><span class="mtext">Ventas</span>
+							</a>
+						</li>
+
 						<li class="dropdown">
 							<a href="javascript:;" class="dropdown-toggle {{ Route::is('tienda.product.*') ? 'active' : '' }}">
 								<span class="micon bi bi-bag"></span><span class="mtext">Administrar productos</span>

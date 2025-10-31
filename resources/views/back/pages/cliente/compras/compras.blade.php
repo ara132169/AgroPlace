@@ -326,8 +326,8 @@
         <!-- Estado vacío simple -->
         <div class="empty-orders">
             <i class="fa fa-shopping-bag"></i>
-            <h3>No orders yet!</h3>
-            <p>Explore our catalog and make your first purchase.</p>
+            <h3>No tienes compras todavia!</h3>
+            <p>Explora nuestro catálogo y realiza tu primera compra.</p>
             <a href="{{ route('productos.index') }}" class="btn-go-shop">
                 <span>GO SHOP</span>
                 <i class="fa fa-arrow-right"></i>

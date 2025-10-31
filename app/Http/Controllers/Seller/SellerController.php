@@ -13,6 +13,9 @@ use App\Models\VerificationToken;
 use Illuminate\Support\Facades\File;
 use SawaStacks\Utils\Kropify;
 use App\Models\Shop;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
 use App\Http\Controllers\Seller\ProductController;
 
 class SellerController extends Controller
@@ -262,6 +265,70 @@ class SellerController extends Controller
             ->get();
 
         return view('front.sellers.index', compact('vendedores'));
+    }
+
+    /**
+     * Mostrar todas las ventas del vendedor
+     */
+    public function misVentas()
+    {
+        $seller = auth()->guard('seller')->user();
+        
+        // Obtener order items de productos vendidos por este vendedor
+        $ventas = OrderItem::with(['order.client', 'product'])
+            ->whereHas('product', function($query) use ($seller) {
+                $query->where('seller_id', $seller->id);
+            })
+            ->with(['order' => function($query) {
+                $query->withCount('items');
+            }])
+            ->latest()
+            ->get()
+            ->groupBy('order_id') // Agrupar por order_id para mostrar órdenes completas
+            ->map(function($items, $orderId) {
+                $firstItem = $items->first();
+                $order = $firstItem->order;
+                $totalItems = $items->count();
+                $totalAmount = $items->sum(function($item) {
+                    return $item->price * $item->quantity;
+                });
+                
+                return (object)[
+                    'id' => $orderId,
+                    'order' => $order,
+                    'items_count' => $totalItems,
+                    'total_seller_amount' => $totalAmount,
+                    'created_at' => $order->created_at,
+                    'status' => $order->status,
+                    'client_name' => $order->client->name ?? 'Cliente no disponible',
+                    'items' => $items
+                ];
+            })
+            ->values(); // Resetear keys
+
+        return view('back.pages.tienda.ventas.ventas', compact('ventas'));
+    }
+
+    /**
+     * Mostrar detalle de una venta específica
+     */
+    public function detalleVenta($orderId)
+    {
+        $seller = auth()->guard('seller')->user();
+        
+        // Obtener la orden con los items vendidos por este vendedor
+        $order = Order::with(['client', 'items' => function($query) use ($seller) {
+            $query->whereHas('product', function($q) use ($seller) {
+                $q->where('seller_id', $seller->id);
+            })->with('product');
+        }])->findOrFail($orderId);
+
+        // Verificar que el vendedor tenga productos en esta orden
+        if ($order->items->isEmpty()) {
+            abort(403, 'No tienes productos en esta orden');
+        }
+
+        return view('back.pages.tienda.ventas.detalle-venta', compact('order'));
     }
 
 

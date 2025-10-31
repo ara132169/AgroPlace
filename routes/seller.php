@@ -29,6 +29,10 @@ Route::prefix('tienda')->name('tienda.')->group(function(){
            Route::get('/configuraciones-tienda','shopSettings')->name('configuraciones-tienda');
            Route::post('/configuracion-tienda','shopSetup')->name('configuracion-tienda');
            Route::post('/change-profile-picture', [SellerController::class, 'changeProfilePicture'])->name('change-profile-picture');
+           
+           // Rutas para ventas
+           Route::get('/ventas', 'misVentas')->name('ventas');
+           Route::get('/venta/{orderId}/detalle', 'detalleVenta')->name('venta.detalle');
 
         });
 

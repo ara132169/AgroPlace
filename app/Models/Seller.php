@@ -78,6 +78,37 @@ class Seller extends Authenticatable implements CanResetPassword
         return $this->hasOne(Shop::class);
     }
 
+    /**
+     * Relación para obtener las órdenes de productos vendidos por este vendedor
+     */
+    public function orderItems()
+    {
+        return $this->hasManyThrough(
+            OrderItem::class,
+            Product::class,
+            'seller_id', // Foreign key en products table
+            'product_id', // Foreign key en order_items table
+            'id', // Local key en sellers table
+            'id' // Local key en products table
+        );
+    }
+
+    /**
+     * Relación para obtener las órdenes que contienen productos de este vendedor
+     */
+    public function orders()
+    {
+        return $this->hasManyThrough(
+            Order::class,
+            OrderItem::class,
+            'product_id', // Foreign key en order_items table
+            'id', // Foreign key en orders table
+            'id', // Local key en sellers table (a través de products)
+            'order_id' // Local key en order_items table
+        )->join('products', 'order_items.product_id', '=', 'products.id')
+         ->where('products.seller_id', $this->id);
+    }
+
     protected static function booted()
     {
         static::created(function ($seller) {
