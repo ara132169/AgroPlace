@@ -12,29 +12,44 @@ use App\Models\SubCategory;
 
 if(!function_exists('sendEmail')){
     function sendEmail($mailConfig){
-        require 'PHPMailer/src/Exception.php';
-        require 'PHPMailer/src/PHPMailer.php';
-        require 'PHPMailer/src/SMTP.php';
-        
-
-        $mail = new PHPMailer(true);
-        $mail->SMTPDebug = 0;
-        $mail->isSMTP();
-        $mail->Host = env('EMAIL_HOST');
-        $mail->SMTPAuth = true;
-        $mail->Username = env('EMAIL_USERNAME');
-        $mail->Password= env('EMAIL_PASSWORD');
-        $mail->SMTPSECURE = env ('EMAIL_ENCRYPTION');
-        $mail->PORT = env('EMAIL_PORT');
-        $mail->setFrom($mailConfig['mail_from_email'], $mailConfig['mail_from_name']);
-        $mail->addAddress($mailConfig['mail_recipient_email'],$mailConfig['mail_recipient_name']);
-        $mail->isHTML(true);
-        $mail->Subject = $mailConfig['mail_subject'];
-        $mail->Body = $mailConfig['mail_body'];
-        if($mail->send()){
-            return true;
-        }else
-        {
+        try {
+            require 'PHPMailer/src/Exception.php';
+            require 'PHPMailer/src/PHPMailer.php';
+            require 'PHPMailer/src/SMTP.php';
+            
+            $mail = new PHPMailer(true);
+            $mail->SMTPDebug = 0;
+            $mail->isSMTP();
+            $mail->Host = env('EMAIL_HOST');
+            $mail->SMTPAuth = true;
+            $mail->Username = env('EMAIL_USERNAME');
+            $mail->Password = env('EMAIL_PASSWORD');
+            $mail->SMTPSecure = env('EMAIL_ENCRYPTION');
+            $mail->Port = env('EMAIL_PORT');
+            
+            // Configurar timeouts
+            $mail->Timeout = 30; // 30 segundos
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+            
+            $mail->setFrom($mailConfig['mail_from_email'], $mailConfig['mail_from_name']);
+            $mail->addAddress($mailConfig['mail_recipient_email'], $mailConfig['mail_recipient_name']);
+            $mail->isHTML(true);
+            $mail->Subject = $mailConfig['mail_subject'];
+            $mail->Body = $mailConfig['mail_body'];
+            
+            return $mail->send();
+            
+        } catch (Exception $e) {
+            \Log::error('Error en sendEmail: ' . $e->getMessage());
+            return false;
+        } catch (\Exception $e) {
+            \Log::error('Error general en sendEmail: ' . $e->getMessage());
             return false;
         }
     }
@@ -88,7 +103,11 @@ if( !function_exists('get_social_network') ){
 if( !function_exists('get_categories') ){
     function get_categories(){
         return cache()->remember('frontend_categories', 1800, function () {
-            $categories = Category::with('subcategories')->orderBy('ordering','asc')->get();
+            $categories = Category::with(['subcategories' => function($query) {
+                $query->orderBy('ordering', 'asc');
+            }, 'subcategories.children' => function($query) {
+                $query->orderBy('ordering', 'asc');
+            }])->orderBy('ordering','asc')->get();
             return !empty($categories) ? $categories : [];
         });
     }
@@ -107,5 +126,23 @@ if( !function_exists('get_image') ){
         }
         
         return asset('images/' . $default);
+    }
+}
+
+/** GET CATEGORY IMAGE WITH CACHE BUSTING */
+if( !function_exists('get_category_image') ){
+    function get_category_image($category){
+        if( !$category->category_image ){
+            return null;
+        }
+        
+        $fullPath = public_path('images/categories/' . $category->category_image);
+        if( file_exists($fullPath) ){
+            // Use file modification time for cache busting
+            $version = filemtime($fullPath);
+            return asset('images/categories/' . $category->category_image) . '?v=' . $version;
+        }
+        
+        return null;
     }
 }

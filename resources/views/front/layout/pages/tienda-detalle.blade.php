@@ -7,7 +7,7 @@
     <style>
     .shop-header {
         position: relative;
-        background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+        background: linear-gradient(135deg, #1254A1 0%, #0d4085 100%);
         color: white;
         padding: 4rem 0 6rem 0;
         overflow: hidden;
@@ -35,7 +35,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(135deg, rgba(44, 85, 48, 0.8) 0%, rgba(74, 124, 89, 0.8) 100%);
+        background: linear-gradient(135deg, rgba(18, 84, 161, 0.3) 0%, rgba(13, 64, 133, 0.3) 100%);
         z-index: 2;
     }
     
@@ -110,7 +110,8 @@
     }
     
     .products-header {
-        background: #fff;
+        background: linear-gradient(135deg, #1254A1 0%, #0d4085 100%);
+        color: white;
         padding: 2rem;
         border-radius: 1rem 1rem 0 0;
         box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
@@ -123,13 +124,13 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         border-radius: 1rem;
         overflow: hidden;
-        border: 1px solid #e8f5e8;
+        border: 1px solid #e3f2fd;
     }
     
     .product-card:hover {
         transform: translateY(-8px);
-        box-shadow: 0 15px 35px rgba(34, 85, 48, 0.15);
-        border-color: #2c5530;
+        box-shadow: 0 15px 35px rgba(18, 84, 161, 0.15);
+        border-color: #1254A1;
     }
     
     .lazy-img {
@@ -189,7 +190,7 @@
                          alt="{{ $tienda->shop_name }}">
                 @else
                     <div class="shop-logo-placeholder">
-                        <i class="fas fa-store fa-4x" style="color: #2c5530;"></i>
+                        <i class="fas fa-store fa-4x" style="color: #1254A1;"></i>
                     </div>
                 @endif
             </div>
@@ -239,14 +240,14 @@
         <div class="products-header">
             <div class="row align-items-center">
                 <div class="col">
-                    <h3 class="mb-0" style="color: #2c5530; font-weight: 700;">
-                        <i class="fas fa-box-open me-2" style="color: #4a7c59;"></i>
+                    <h3 class="mb-0" style="color: white; font-weight: 700;">
+                        <i class="fas fa-box-open me-2" style="color: rgba(255,255,255,0.9);"></i>
                         Productos disponibles
                     </h3>
-                    <p class="text-muted mb-0 mt-1">Descubre todos los productos de esta tienda</p>
+                    <p class="mb-0 mt-1" style="color: rgba(255,255,255,0.8);">Descubre todos los productos de esta tienda</p>
                 </div>
                 <div class="col-auto">
-                    <span class="badge bg-success bg-gradient px-3 py-2" style="font-size: 0.9rem;">
+                    <span class="badge px-3 py-2" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 0.9rem;">
                         {{ $productos->total() }} producto{{ $productos->total() != 1 ? 's' : '' }}
                     </span>
                 </div>
@@ -274,7 +275,7 @@
                     </div>
                     
                     <div class="card-body d-flex flex-column">
-                        <h6 class="card-title fw-bold" style="color: #2c5530;">{{ Str::limit($producto->name, 50) }}</h6>
+                        <h6 class="card-title fw-bold" style="color: #1254A1;">{{ Str::limit($producto->name, 50) }}</h6>
                         <p class="card-text text-muted small flex-grow-1">
                             {{ Str::limit($producto->summary, 80) }}
                         </p>
@@ -287,7 +288,7 @@
                                             ${{ number_format($producto->compare_price, 2) }}
                                         </small>
                                     @endif
-                                    <div class="fw-bold fs-5" style="color: #2c5530;">
+                                    <div class="fw-bold fs-5" style="color: #1254A1;">
                                         ${{ number_format($producto->price, 2) }}
                                     </div>
                                 </div>
@@ -295,7 +296,7 @@
                             
                             <a href="{{ route('producto.index', $producto->slug) }}" 
                                class="btn w-100"
-                               style="background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%); 
+                               style="background: linear-gradient(135deg, #1254A1 0%, #0d4085 100%); 
                                       color: white; border: none; border-radius: 0.75rem; 
                                       padding: 0.75rem; font-weight: 600; 
                                       transition: all 0.3s ease;">
@@ -308,10 +309,10 @@
         @empty
             <div class="col-12 text-center py-5">
                 <div class="py-5">
-                    <i class="fas fa-box-open fa-4x mb-4" style="color: #4a7c59; opacity: 0.6;"></i>
-                    <h4 style="color: #2c5530;">No hay productos disponibles</h4>
+                    <i class="fas fa-box-open fa-4x mb-4" style="color: #1254A1; opacity: 0.6;"></i>
+                    <h4 style="color: #1254A1;">No hay productos disponibles</h4>
                     <p class="text-muted">Esta tienda aún no ha publicado productos.</p>
-                    <a href="{{ url()->previous() }}" class="btn btn-outline-secondary mt-3">
+                    <a href="{{ url()->previous() }}" class="btn btn-outline-primary mt-3">
                         <i class="fas fa-arrow-left me-1"></i>Volver atrás
                     </a>
                 </div>

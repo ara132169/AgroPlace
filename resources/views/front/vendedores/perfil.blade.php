@@ -16,6 +16,34 @@
         <!-- Start of Header -->
 		@include('front.layout.inc.headerdos')
         <!-- End of Header -->
+
+        <!-- Mensajes de éxito o error -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
 <br>
          <!-- Start of Main -->
          <main class="main">
@@ -43,19 +71,23 @@
                             <a href="#" class="sidebar-toggle"><i class="fas fa-chevron-right"></i></a>
                             <div class="sidebar-content">
                                 <div class="sticky-sidebar">
-                                   
                                     <!-- End of Widget -->
                                     <div class="widget widget-collapsible widget-contact">
                                         <h3 class="widget-title"><span>Contactar Vendedor</span></h3>
                                         <div class="widget-body">
-                                            <input type="text" class="form-control" name="name" id="name"
-                                                placeholder="Nombre" />
-                                            <input type="text" class="form-control" name="email" id="email_1"
-                                                placeholder="email" />
-                                            <textarea name="message" maxlength="1000" cols="25" rows="6"
-                                                placeholder="Escribe tu mensaje..." class="form-control"
-                                                required="required"></textarea>
-                                            <a href="#" class="btn btn-dark btn-rounded">Enviar</a>
+                                            <form action="{{ route('vendedor.contactar', $vendedor->username) }}" method="POST" id="contact-form">
+                                                @csrf
+                                                <input type="text" class="form-control mb-3" name="name" id="name"
+                                                    placeholder="Nombre" required />
+                                                <input type="email" class="form-control mb-3" name="email" id="email_1"
+                                                    placeholder="Email" required />
+                                                <textarea name="message" maxlength="1000" cols="25" rows="6"
+                                                    placeholder="Escribe tu mensaje..." class="form-control mb-3"
+                                                    required></textarea>
+                                                <button type="submit" class="btn btn-dark btn-rounded w-100">
+                                                    <i class="fas fa-paper-plane me-2"></i>Enviar Mensaje
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                     <!-- End of Widget -->
@@ -198,6 +230,33 @@
 
     <!-- Main JS -->
     <script src="/front/assets/js/main.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Formulario de contacto
+            const contactForm = document.getElementById('contact-form');
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            contactForm.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+            });
+            
+            // Auto-dismiss alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    if (alert.parentNode) {
+                        alert.classList.remove('show');
+                        setTimeout(function() {
+                            alert.remove();
+                        }, 150);
+                    }
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 
 </html>

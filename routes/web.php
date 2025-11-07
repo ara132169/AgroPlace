@@ -26,8 +26,14 @@
     |
     */
 
-    Route::get('/', [FrontEndController::class, 'index'])->name('inicio');
-    Route::get('/productos', [FrontEndController::class, 'productos'])->name('productos.index');
+Route::get('/', [FrontEndController::class, 'index'])->name('inicio');
+
+// RUTA DE PRUEBA SIMPLE - DEBE ESTAR AL PRINCIPIO
+Route::get('/test-simple', function() {
+    return 'RUTA FUNCIONA - NO HAY REDIRECCIÓN';
+});
+
+Route::get('/productos', [FrontEndController::class, 'productos'])->name('productos.index');
     Route::view('/example-page','example-page');
 
     // Debug routes
@@ -88,6 +94,7 @@
     Route::view('/example-auth','example-auth');
     Route::view('/nosotros','nosotros')->name('nosotros');
     Route::view('/contacto','contacto')->name('contacto');
+    Route::post('/contacto/enviar', [\App\Http\Controllers\ContactController::class, 'enviarMensaje'])->name('contacto.enviar');
 
     // Ruta para mostrar productos por categoría
     Route::get('/categoria/{slug}', [ProductController::class, 'productosPorCategoria'])->name('categoria.productos');
@@ -101,8 +108,11 @@
 
 
     Route::get('/vendedor/{username}', [FrontEndController::class, 'perfilVendedor'])->name('perfil.vendedor');
+    Route::post('/vendedor/{username}/contactar', [FrontEndController::class, 'contactarVendedor'])->name('vendedor.contactar');
 
     Route::get('/carrito', [FrontEndController::class, 'verCarrito'])->name('front.layout.pages.cliente.carrito.index');
+    Route::post('/carrito/actualizar', [FrontEndController::class, 'actualizarCarrito'])->name('carrito.actualizar');
+    Route::post('/carrito/actualizar-bulk', [FrontEndController::class, 'actualizarCarritoBulk'])->name('carrito.actualizar.bulk');
     // Route::get('/cliente/carrito', [CartController::class, 'index'])->name('cliente.carrito.index');
     // Disminuir cantidad
     // Route::post('/carrito/disminuir/{id}', [CartController::class, 'disminuir'])->name('carrito.disminuir');
@@ -169,13 +179,82 @@ Route::get('/test-stripe', function () {
         Route::get('cliente/password/reset/{token}', [ClientResetPasswordController::class, 'showResetForm'])->name('password.reset');
         Route::post('cliente/password/reset', [ClientResetPasswordController::class, 'reset'])->name('client.password.update');
 
+        // RUTA DE DEBUG ESPECÍFICA PARA SUBCATEGORÍAS
+        Route::get('/debug-subcategoria-simple/{slug}', function($slug) {
+            $output = [];
+            $output[] = "=== DEBUG SUBCATEGORÍA ===";
+            $output[] = "Slug recibido: " . $slug;
+            
+            try {
+                $subcategoria = \App\Models\SubCategory::where('subcategory_slug', $slug)->first();
+                $output[] = "Subcategoría encontrada: " . ($subcategoria ? "SÍ" : "NO");
+                
+                if ($subcategoria) {
+                    $output[] = "ID: " . $subcategoria->id;
+                    $output[] = "Nombre: " . $subcategoria->subcategory_name;
+                    $output[] = "Category ID: " . $subcategoria->category_id;
+                    
+                    $categoria = \App\Models\Category::find($subcategoria->category_id);
+                    $output[] = "Categoría encontrada: " . ($categoria ? $categoria->category_name : "NO");
+                    
+                    $productos = \App\Models\Product::where('subcategory', $subcategoria->id)->where('visibility', 1)->count();
+                    $output[] = "Productos en subcategoría: " . $productos;
+                }
+                
+            } catch (\Exception $e) {
+                $output[] = "ERROR: " . $e->getMessage();
+            }
+            
+            return '<pre>' . implode("\n", $output) . '</pre>';
+        });
+
         Route::get('/subcategoria/{slug}', [ProductController::class, 'productosPorSubcategoria'])->name('subcategoria.productos');
+        
+        // Ruta de prueba simple
+        Route::get('/test-subcategoria/{slug}', function($slug) {
+            return response()->json([
+                'mensaje' => 'Ruta funciona',
+                'slug' => $slug,
+                'controlador_funciona' => 'SÍ'
+            ]);
+        });
+        
+        // Ruta de debug para subcategorías
+        Route::get('/debug-subcategoria/{slug}', function($slug) {
+            $subcategoria = \App\Models\SubCategory::where('subcategory_slug', $slug)->first();
+            if (!$subcategoria) {
+                return response()->json([
+                    'error' => 'Subcategoría no encontrada',
+                    'slug_buscado' => $slug,
+                    'subcategorias_disponibles' => \App\Models\SubCategory::pluck('subcategory_slug')->toArray()
+                ]);
+            }
+            return response()->json([
+                'subcategoria' => $subcategoria,
+                'categoria' => $subcategoria->category
+            ]);
+        });
+        
+        // Ruta para listar todas las subcategorías
+        Route::get('/listar-subcategorias', function() {
+            $subcategorias = \App\Models\SubCategory::with('category')->get();
+            $lista = [];
+            foreach($subcategorias as $sub) {
+                $lista[] = [
+                    'nombre' => $sub->subcategory_name,
+                    'slug' => $sub->subcategory_slug,
+                    'categoria' => $sub->category ? $sub->category->category_name : 'Sin categoría'
+                ];
+            }
+            return response()->json($lista);
+        });
         
 
         Route::get('/tiendas', [FrontEndController::class, 'mostrarTiendas'])->name('tiendas.index');
 
         // Ruta para mostrar detalle de tienda - usar controlador existente
         Route::get('/tienda/detalle/{id}', [FrontEndController::class, 'detalleTienda'])->name('tienda.detalle');
+
 
 
 

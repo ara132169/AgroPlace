@@ -29,12 +29,9 @@
                     <ul class="mobile-menu">
                         <li><a href="{{ url('/') }}">Inicio</a></li>
                         <li>
-                            <a href="vendor-dokan-store.html">Tiendas</a>
+                            <a href="{{ route('tiendas.index') }}">Tiendas</a>
                         </li>
-                        <li>
-                            <a href="blog-mask-grid.html">Blog</a>
-                           
-                        </li>
+                      
                         <li>
                             <a href="{{ url('nosotros') }}">Nosotros</a>
                            
@@ -59,7 +56,13 @@
                     @foreach(get_categories() as $category)
                         <li>
                             <a href="{{ route('categoria.productos', ['slug' => $category->category_slug]) }}">
-                                <i class="/images/categories/{{$category->category_image}}"></i> {{$category->category_name}}
+                                @php $categoryImage = get_category_image($category); @endphp
+                                @if($categoryImage)
+                                    <img src="{{ $categoryImage }}" alt="{{ $category->category_name }}" width="20" height="20" style="margin-right: 8px; vertical-align: middle;">
+                                @else
+                                    <i class="w-icon-category" style="margin-right: 8px; font-size: 16px; vertical-align: middle;"></i>
+                                @endif
+                                {{$category->category_name}}
                                                 @if( count($category->subcategories) > 0 )
                                                     
                                                 @endif
@@ -69,11 +72,11 @@
                                 <li>
                                 @foreach($category->subcategories as $subcategory )
                                 @if($subcategory->is_child_of == 0)
-                                    <a href="">{{ $subcategory->subcategory_name }}</a>
+                                    <a href="{{ route('subcategoria', ['categorySlug' => $category->category_slug, 'subcategorySlug' => $subcategory->subcategory_slug]) }}">{{ $subcategory->subcategory_name }}</a>
                                     @if(!empty($subcategory->children) && $subcategory->children->count())
                                     <ul>
                                     @foreach($subcategory->children as $child_subcategory)
-                                        <li><a href="{{ route('subcategoria.productos', ['slug' => $child_subcategory->subcategory_slug]) }}">{{ $child_subcategory->subcategory_name }}</a>
+                                        <li><a href="{{ route('subsubcategoria', ['categorySlug' => $category->category_slug, 'subcategorySlug' => $subcategory->subcategory_slug, 'subsubcategorySlug' => $child_subcategory->subcategory_slug]) }}">{{ $child_subcategory->subcategory_name }}</a>
                                         </li>
                                         @endforeach   
                                     </ul>

@@ -193,37 +193,48 @@ class FrontEndController extends Controller
 
     public function getProductsBySubcategory($categorySlug, $subcategorySlug)
     {
-        $category = Category::where('category_slug', $categorySlug)->first();
-        $subcategory = SubCategory::where('subcategory_slug', $subcategorySlug)->first();
+        $categoria = Category::where('category_slug', $categorySlug)
+            ->with(['subcategories' => function($query) {
+                $query->orderBy('ordering', 'asc');
+            }, 'subcategories.children' => function($query) {
+                $query->orderBy('ordering', 'asc');
+            }])
+            ->first();
+            
+        $subcategoria = SubCategory::where('subcategory_slug', $subcategorySlug)->first();
 
-        if (!$category || !$subcategory) {
+        if (!$categoria || !$subcategoria) {
             return redirect()->route('inicio')->with('error', 'Categoría o subcategoría no encontrada.');
         }
 
-        $productos = Product::where('subcategory', $subcategory->id)
+        $productos = Product::where('subcategory', $subcategoria->id)
             ->where('visibility', 1)
-            ->get();
+            ->paginate(20);
 
-        return view('front.subcategoria', compact('productos', 'category', 'subcategory'));
+        return view('front.pages.subcategoria', compact('productos', 'categoria', 'subcategoria'));
     }
 
     public function getProductsBySubsubcategory($categorySlug, $subcategorySlug, $subsubcategorySlug)
     {
         // Buscar la categoría, subcategoría y subsubcategoría por su slug
-        $category = Category::where('category_slug', $categorySlug)->first();
-        $subcategory = SubCategory::where('subcategory_slug', $subcategorySlug)->first();
-        $subsubcategory = SubCategory::where('subcategory_slug', $subsubcategorySlug)->first();
+        $categoria = Category::where('category_slug', $categorySlug)->first();
+        $subcategoria = SubCategory::where('subcategory_slug', $subcategorySlug)
+            ->with(['children' => function($query) {
+                $query->orderBy('ordering', 'asc');
+            }])
+            ->first();
+        $subsubcategoria = SubCategory::where('subcategory_slug', $subsubcategorySlug)->first();
 
-        if (!$category || !$subcategory || !$subsubcategory) {
+        if (!$categoria || !$subcategoria || !$subsubcategoria) {
             return redirect()->route('inicio')->with('error', 'Categoría, subcategoría o subsubcategoría no encontrada.');
         }
 
         // Obtener los productos de la subsubcategoría
-        $productos = Product::where('subcategory', $subsubcategory->id)
+        $productos = Product::where('subcategory', $subsubcategoria->id)
             ->where('visibility', 1)
-            ->get();
+            ->paginate(20);
 
-        return view('front.subsubcategoria', compact('productos', 'category', 'subcategory', 'subsubcategory'));
+        return view('front.pages.subsubcategoria', compact('productos', 'categoria', 'subcategoria', 'subsubcategoria'));
     }
 
 
@@ -287,6 +298,86 @@ class FrontEndController extends Controller
         return view('back.pages.cliente.compras.carrito', compact('cartItems', 'subtotal'));
     }
 
+    public function actualizarCarrito(Request $request)
+    {
+        \Log::info('🛒 ACTUALIZAR CARRITO INDIVIDUAL LLAMADO');
+        \Log::info('📥 Request Method: ' . $request->method());
+        \Log::info('📥 Content Type: ' . $request->header('Content-Type'));
+        \Log::info('📋 Request completo:', $request->all());
+        
+        $productId = $request->input('product_id');
+        $quantity = $request->input('quantity');
+        
+        \Log::info('📦 Producto ID: ' . $productId);
+        \Log::info('🔢 Cantidad: ' . $quantity);
+        
+        // Obtener el carrito de la sesión
+        $cart = session('cart', []);
+        \Log::info('🛒 Carrito actual:', $cart);
+        
+        // Actualizar la cantidad si el producto existe en el carrito
+        if (isset($cart[$productId])) {
+            $cart[$productId]['quantity'] = max(1, intval($quantity)); // Mínimo 1
+            session(['cart' => $cart]);
+            session()->save(); // Forzar guardado inmediato
+            
+            \Log::info('✅ Carrito actualizado correctamente');
+            \Log::info('🛒 Nuevo carrito:', session('cart'));
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Cantidad actualizada',
+                'quantity' => $cart[$productId]['quantity']
+            ]);
+        }
+        
+        \Log::info('❌ Producto no encontrado en carrito');
+        return response()->json([
+            'success' => false,
+            'message' => 'Producto no encontrado en el carrito'
+        ], 404);
+    }
+
+    // Nuevo método para actualizar múltiples productos a la vez
+    public function actualizarCarritoBulk(Request $request)
+    {
+        \Log::info('🔥 BULK UPDATE ENDPOINT LLAMADO');
+        \Log::info('📥 Request Method: ' . $request->method());
+        \Log::info('📥 Content Type: ' . $request->header('Content-Type'));
+        \Log::info('📋 Request completo:', $request->all());
+        
+        $cartData = $request->input('cart', []);
+        
+        \Log::info('📦 Actualizando carrito BULK', ['cart_data' => $cartData]);
+        
+        // Obtener el carrito actual de la sesión
+        $cart = session('cart', []);
+        
+        \Log::info('📦 Carrito ANTES de actualizar', ['cart' => $cart]);
+        
+        // Actualizar cada producto
+        foreach ($cartData as $productId => $quantity) {
+            if (isset($cart[$productId])) {
+                $cart[$productId]['quantity'] = max(1, intval($quantity));
+                \Log::info("  ✅ Actualizado producto {$productId} a cantidad {$quantity}");
+            } else {
+                \Log::warning("  ⚠️ Producto {$productId} NO existe en el carrito");
+            }
+        }
+        
+        // Guardar el carrito actualizado
+        session(['cart' => $cart]);
+        session()->save();
+        
+        \Log::info('📦 Carrito DESPUÉS de actualizar', ['cart' => $cart]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Carrito actualizado',
+            'cart' => $cart
+        ]);
+    }
+
 
 
 
@@ -313,6 +404,60 @@ class FrontEndController extends Controller
 
         // Retornar vista con datos
         return view('front.vendedores.perfil', compact('vendedor', 'productos', 'categorias'));
+    }
+
+    public function contactarVendedor(Request $request, $username)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'message' => 'required|string|max:1000',
+        ], [
+            'name.required' => 'El nombre es obligatorio',
+            'email.required' => 'El email es obligatorio',
+            'email.email' => 'Por favor ingresa un email válido',
+            'message.required' => 'El mensaje es obligatorio',
+            'message.max' => 'El mensaje no puede tener más de 1000 caracteres',
+        ]);
+
+        // Buscar el vendedor
+        $vendedor = Seller::where('username', $username)->firstOrFail();
+
+        // Preparar datos del email
+        $emailData = [
+            'vendedor_name' => $vendedor->name,
+            'remitente_name' => $request->name,
+            'remitente_email' => $request->email,
+            'mensaje' => $request->message,
+            'fecha' => now()->format('d/m/Y H:i'),
+        ];
+
+        // Enviar email al vendedor
+        try {
+            // Renderizar el template de email
+            $emailBody = view('email-templates.contacto-vendedor', $emailData)->render();
+            
+            // Configurar el email
+            $mailConfig = [
+                'mail_from_email' => env('EMAIL_FROM_EMAIL', 'noreply@agromarket.com'),
+                'mail_from_name' => env('EMAIL_FROM_NAME', 'AgroMarket'),
+                'mail_recipient_email' => $vendedor->email,
+                'mail_recipient_name' => $vendedor->name,
+                'mail_subject' => 'Nuevo mensaje de contacto',
+                'mail_body' => $emailBody
+            ];
+            
+            $emailSent = sendEmail($mailConfig);
+            
+            if ($emailSent) {
+                return redirect()->back()->with('success', 'Tu mensaje ha sido enviado exitosamente al vendedor.');
+            } else {
+                return redirect()->back()->with('error', 'Hubo un problema al enviar tu mensaje. Por favor intenta nuevamente.');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error al enviar email de contacto a vendedor: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Hubo un problema al enviar tu mensaje. Por favor intenta nuevamente.');
+        }
     }
 
   

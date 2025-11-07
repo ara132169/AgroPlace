@@ -46,65 +46,51 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="product-thumbnail">
-                                            <div class="p-relative">
-                                                <a href="product-default.html">
-                                                    <figure>
-                                                        <img src="assets/images/shop/12.jpg" alt="product"
-                                                            width="300" height="338">
-                                                    </figure>
+                                    @forelse($cartItems as $item)
+                                        @if($item->product)
+                                        <tr>
+                                            <td class="product-thumbnail">
+                                                <div class="p-relative">
+                                                    <a href="{{ route('producto.index', $item->product->slug) }}">
+                                                        <figure>
+                                                            <img src="{{ asset('images/products/' . $item->product->product_image) }}" 
+                                                                alt="{{ $item->product->name }}"
+                                                                width="300" height="338">
+                                                        </figure>
+                                                    </a>
+                                                    <button type="submit" class="btn btn-close"><i
+                                                            class="fas fa-times"></i></button>
+                                                </div>
+                                            </td>
+                                            <td class="product-name">
+                                                <a href="{{ route('producto.index', $item->product->slug) }}">
+                                                    {{ $item->product->name }}
                                                 </a>
-                                                <button type="submit" class="btn btn-close"><i
-                                                        class="fas fa-times"></i></button>
-                                            </div>
-                                        </td>
-                                        <td class="product-name">
-                                            <a href="product-default.html">
-                                                Classic Simple Backpack
-                                            </a>
-                                        </td>
-                                        <td class="product-price"><span class="amount">$40.00</span></td>
-                                        <td class="product-quantity">
-                                            <div class="input-group">
-                                                <input class="quantity form-control" type="number" min="1" max="100000">
-                                                <button class="quantity-plus w-icon-plus"></button>
-                                                <button class="quantity-minus w-icon-minus"></button>
-                                            </div>
-                                        </td>
-                                        <td class="product-subtotal">
-                                            <span class="amount">$40.00</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="product-thumbnail">
-                                            <div class="p-relative">
-                                                <a href="product-default.html">
-                                                    <figure>
-                                                        <img src="assets/images/shop/13.jpg" alt="product"
-                                                            width="300" height="338">
-                                                    </figure>
+                                            </td>
+                                            <td class="product-price"><span class="amount">${{ number_format($item->product->price, 2) }}</span></td>
+                                            <td class="product-quantity">
+                                                <div class="input-group">
+                                                    <input class="quantity form-control" type="number" 
+                                                           min="1" max="100000" value="{{ $item->quantity }}">
+                                                    <button class="quantity-plus w-icon-plus"></button>
+                                                    <button class="quantity-minus w-icon-minus"></button>
+                                                </div>
+                                            </td>
+                                            <td class="product-subtotal">
+                                                <span class="amount">${{ number_format($item->product->price * $item->quantity, 2) }}</span>
+                                            </td>
+                                        </tr>
+                                        @endif
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5">
+                                                <p class="text-muted">Tu carrito está vacío</p>
+                                                <a href="{{ route('productos.index') }}" class="btn btn-primary">
+                                                    <i class="fas fa-shopping-bag me-2"></i>Comenzar a comprar
                                                 </a>
-                                                <button class="btn btn-close"><i class="fas fa-times"></i></button>
-                                            </div>
-                                        </td>
-                                        <td class="product-name">
-                                            <a href="product-default.html">
-                                                Smart Watch
-                                            </a>
-                                        </td>
-                                        <td class="product-price"><span class="amount">$60.00</span></td>
-                                        <td class="product-quantity">
-                                            <div class="input-group">
-                                                <input class="quantity form-control" type="number" min="1" max="100000">
-                                                <button class="quantity-plus w-icon-plus"></button>
-                                                <button class="quantity-minus w-icon-minus"></button>
-                                            </div>
-                                        </td>
-                                        <td class="product-subtotal">
-                                            <span class="amount">$60.00</span>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
 
@@ -126,7 +112,7 @@
                                     <h3 class="cart-title text-uppercase">Cart Totals</h3>
                                     <div class="cart-subtotal d-flex align-items-center justify-content-between">
                                         <label class="ls-25">Subtotal</label>
-                                        <span>$100.00</span>
+                                        <span>${{ number_format($total, 2) }}</span>
                                     </div>
 
                                     <hr class="divider">
@@ -207,9 +193,9 @@
                                     <hr class="divider mb-6">
                                     <div class="order-total d-flex justify-content-between align-items-center">
                                         <label>Total</label>
-                                        <span class="ls-50">$100.00</span>
+                                        <span class="ls-50">${{ number_format($total, 2) }}</span>
                                     </div>
-                                    <a href="#"
+                                    <a href="{{ route('cliente.checkout') }}"
                                         class="btn btn-block btn-dark btn-icon-right btn-rounded  btn-checkout">
                                         Proceed to checkout<i class="w-icon-long-arrow-right"></i></a>
                                 </div>

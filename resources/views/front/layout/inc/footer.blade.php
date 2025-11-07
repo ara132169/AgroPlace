@@ -1,6 +1,6 @@
 <footer class="footer footer-dark appear-animate" data-animation-options="{
             'name': 'fadeIn'
-        }">
+        }" style="background: #2a2a2a; padding: 20px 0; margin-top: 50px; border-top: 3px solid #4CAF50;">
 
         <div class="footer-newsletter bg-agrodark">
        </div>
@@ -44,13 +44,13 @@
                                 </a>
                                 <div class="widget-body">
                                     <p class="widget-about-title">¿Tienes dudas?</p>
-                                    <a href="tel:" class="widget-about-call">+52 2232323212</a>
-                                    <a href="mailto:" class="widget-about-call">contacto@agroplace.com</a>
+                                    <a href="tel:{{ get_settings()->site_phone ?? '+52 2232323212' }}" class="widget-about-call">{{ get_settings()->site_phone ?? '+52 2232323212' }}</a>
+                                    <a href="mailto:{{ get_settings()->site_email ?? 'contacto@agroplace.com' }}" class="widget-about-call">{{ get_settings()->site_email ?? 'contacto@agroplace.com' }}</a>
                                     
 
                                     <div class="social-icons social-icons-colored">
                                         <a href="{{ get_social_network()->facebook_url }}" class="social-icon social-facebook w-icon-facebook"></a>
-                                        <a href="#" class="social-icon social-instagram w-icon-instagram"></a>
+                                        <a href="{{ get_social_network()->instagram_url }}" class="social-icon social-instagram w-icon-instagram"></a>
                                 
                                       
                                     </div>
@@ -61,12 +61,12 @@
                             <div class="widget">
                                 <h3 class="widget-title">Menú</h3>
                                 <ul class="widget-body">
-                                    <li><a href="about-us.html">Inicio</a></li>
-                                    <li><a href="#">Productos</a></li>
-                                    <li><a href="#">Tiendas</a></li>
-                                    <li><a href="contact-us.html">Blog</a></li>
-                                    <li><a href="#">Nosotros</a></li>
-                                    <li><a href="#">Contacto</a></li>
+                                    <li><a href="{{ url('/') }}">Inicio</a></li>
+                                    <li><a href="{{ route('productos.index') }}">Productos</a></li>
+                                    <li><a href="{{ route('tiendas.index') }}">Tiendas</a></li>
+                                    <li><a href="#">Blog</a></li>
+                                    <li><a href="{{ url('nosotros') }}">Nosotros</a></li>
+                                    <li><a href="{{ url('contacto') }}">Contacto</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -74,10 +74,8 @@
                             <div class="widget">
                                 <h4 class="widget-title">Mi cuenta</h4>
                                 <ul class="widget-body">
-                                    
-                                    <li><a href="cart.html">Ver Carrito </a></li>
-                                    <li><a href="login.html">Ingresar</a></li>
-                                  
+                                    <li><a href="{{ route('cliente.carrito') }}">Ver Carrito</a></li>
+                                    <li><a href="{{ url('/cliente/ingresar') }}">Ingresar</a></li>
                                     <li><a href="#">Mi lista de deseo</a></li>
                                     <li><a href="#">Política de privacidad</a></li>
                                 </ul>

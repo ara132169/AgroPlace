@@ -53,6 +53,8 @@ class AdminSettings extends Component
         $update = $settings->save();
 
         if( $update ){
+            // Limpiar caché para que los cambios se reflejen inmediatamente
+            cache()->forget('site_settings');
             toastr()->addSuccess('Se han aplicado correctamente los cambios.');
         }else{
             toastr()->error('Hubo un error al actualizar los datos.');

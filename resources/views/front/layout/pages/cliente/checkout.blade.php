@@ -153,47 +153,84 @@
                                     <div class="order-summary-wrapper sticky-sidebar">
                                         <h3 class="title text-uppercase ls-10">Resumen de tu pedido</h3>
                                         <div class="order-summary">
-                                            <table class="order-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th colspan="2">
-                                                            <b>Producto(s)</b>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                @foreach ($cartItems as $item)
-                                                    <tr class="bb-no">
-                                                        <td class="product-name">{{ $item['name'] }} <i
-                                                                class="fas fa-times"></i> <span
-                                                                class="product-quantity">{{ $item['quantity'] }}</span></td>
-                                                        <td class="product-total">${{ $item['price'] }}</td>
-                                                    </tr>
+                                            <h4 class="title font-weight-bold mb-4">Resumen del pedido</h4>
+                                            
+                                            <!-- Lista de productos con imágenes -->
+                                            <div class="checkout-products-list mb-4">
+                                                @foreach ($cartItems as $id => $item)
+                                                <div class="checkout-product-item d-flex align-items-center mb-3 pb-3 border-bottom">
+                                                    <!-- Imagen del producto -->
+                                                    <div class="product-image mr-3" style="flex-shrink: 0;">
+                                                        <img src="{{ asset('images/products/' . ($item['image'] ?? 'default.jpg')) }}" 
+                                                             alt="{{ $item['name'] }}" 
+                                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e1e1e1;">
+                                                    </div>
+                                                    
+                                                    <!-- Información del producto -->
+                                                    <div class="product-details flex-grow-1">
+                                                        <h6 class="product-name mb-2" style="font-size: 14px; font-weight: 600; color: #333;">
+                                                            {{ $item['name'] }}
+                                                        </h6>
+                                                        <p class="product-price mb-2" style="font-size: 13px; color: #666;">
+                                                            Precio unitario: <strong>${{ number_format($item['price'], 2) }}</strong>
+                                                        </p>
+                                                        
+                                                        <!-- Controles de cantidad -->
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <div class="quantity-controls d-flex align-items-center" style="background: #fff; border: 1px solid #e1e1e1; border-radius: 25px; padding: 4px;">
+                                                                <button type="button" 
+                                                                        class="btn btn-sm quantity-minus-checkout" 
+                                                                        data-product-id="{{ $item['product_id'] }}"
+                                                                        style="width: 36px; height: 36px; padding: 0; border: none; background: transparent; color: #666; border-radius: 50%; transition: all 0.3s;">
+                                                                    <i class="w-icon-minus" style="font-size: 12px; font-weight: bold;"></i>
+                                                                </button>
+                                                                <input type="number" 
+                                                                       class="form-control form-control-sm text-center quantity-checkout" 
+                                                                       value="{{ $item['quantity'] }}" 
+                                                                       min="1" 
+                                                                       data-product-id="{{ $item['product_id'] }}"
+                                                                       data-price="{{ $item['price'] }}"
+                                                                       style="width: 50px; height: 36px; border: none; background: transparent; font-weight: 700; font-size: 15px; color: #333;">
+                                                                <button type="button" 
+                                                                        class="btn btn-sm quantity-plus-checkout" 
+                                                                        data-product-id="{{ $item['product_id'] }}"
+                                                                        style="width: 36px; height: 36px; padding: 0; border: none; background: transparent; color: #666; border-radius: 50%; transition: all 0.3s;">
+                                                                    <i class="w-icon-plus" style="font-size: 12px; font-weight: bold;"></i>
+                                                                </button>
+                                                            </div>
+                                                            
+                                                            <!-- Subtotal del producto -->
+                                                            <div class="product-subtotal" style="text-align: right;">
+                                                                <strong class="product-total" 
+                                                                        data-product-id="{{ $item['product_id'] }}"
+                                                                        style="font-size: 16px; color: #4CAF50; font-weight: 700;">
+                                                                    ${{ number_format($item['price'] * $item['quantity'], 2) }}
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 @endforeach
-                                                    
-                                                    <tr class="cart-subtotal bb-no">
-                                                        <td>
-                                                            <b>Subtotal</b>
-                                                        </td>
-                                                        <td>
-                                                            <b>${{ $subtotal }}</b>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                                <tfoot>
-                                                    
-                                                    <tr class="order-total">
-                                                        <th>
-                                                            <b>Total</b>
-                                                        </th>
-                                                        <td>
-                                                            <b>${{ $subtotal }}</b>
-                                                        </td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
+                                            </div>
+                                            
+                                            <!-- Resumen de totales -->
+                                            <div class="checkout-summary-totals p-3" style="background-color: #f8f9fa; border-radius: 8px;">
+                                                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                                    <span style="font-size: 15px; color: #666;">Subtotal</span>
+                                                    <strong class="checkout-subtotal" style="font-size: 16px; color: #333;">
+                                                        ${{ number_format($subtotal, 2) }}
+                                                    </strong>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span style="font-size: 17px; font-weight: 700; color: #333;">Total</span>
+                                                    <strong class="checkout-total" style="font-size: 20px; font-weight: 700; color: #4CAF50;">
+                                                        ${{ number_format($subtotal, 2) }}
+                                                    </strong>
+                                                </div>
+                                            </div>
 
-                                            <div class="payment-methods" id="payment_method">
+                                            <div class="payment-methods mt-4" id="payment_method">
                                                 <h4 class="title font-weight-bold ls-25 pb-0 mb-3">Método de Pago</h4>
                                                 
                                                 <!-- Stripe Card Element -->
@@ -288,10 +325,19 @@
     <script src="https://js.stripe.com/v3/"></script>
     
     <script>
+        // Esperar a que TODO esté cargado (incluyendo scripts del tema)
+        window.addEventListener('load', function() {
+            setTimeout(initCheckoutQuantityControls, 100);
+        });
+        
+        // TEST SIMPLE - Verificar que JavaScript funciona
+        console.log('🚀 SCRIPT INICIADO CORRECTAMENTE');
+        console.log('📅 Timestamp:', new Date().toISOString());
+        
         // Initialize Stripe
         const stripe = Stripe('{{ $stripePublishableKey }}');
         const elements = stripe.elements();
-        
+
         // Create card element
         const cardElement = elements.create('card', {
             style: {
@@ -335,6 +381,53 @@
             spinner.classList.remove('d-none');
             
             try {
+                // PRIMERO: Sincronizar carrito completo en UNA sola llamada
+                console.log('🛒 Sincronizando cantidades antes del pago...');
+                console.log('🌐 URL del endpoint:', '{{ route("carrito.actualizar.bulk") }}');
+                
+                const cartData = {};
+                document.querySelectorAll('.quantity-checkout').forEach(input => {
+                    const productId = input.dataset.productId;
+                    const cantidad = parseInt(input.value) || 1;
+                    cartData[productId] = cantidad;
+                    console.log(`  📦 Producto ${productId}: ${cantidad} unidades`);
+                });
+                
+                console.log('📋 Datos completos a enviar:', cartData);
+                
+                try {
+                    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    console.log('🔑 Usando CSRF token:', token);
+                    
+                    const syncResponse = await fetch('{{ route("carrito.actualizar.bulk") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ cart: cartData })
+                    });
+                    
+                    const syncResult = await syncResponse.json();
+                    console.log('✅ Respuesta del servidor:', syncResult);
+                    
+                    if (!syncResult.success) {
+                        console.error('❌ Error al sincronizar carrito');
+                    } else {
+                        console.log('✅ Carrito sincronizado correctamente');
+                    }
+                    
+                    // Esperar 500ms para asegurar que la sesión se guarde
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                } catch (syncError) {
+                    console.error('❌ Error sincronizando:', syncError);
+                    // Continuar de todos modos
+                }
+                
+                // SEGUNDO: Crear el método de pago
+                console.log('💳 Creando método de pago...');
                 // Create payment method
                 const {paymentMethod, error} = await stripe.createPaymentMethod({
                     type: 'card',
@@ -452,7 +545,199 @@
             buttonText.classList.remove('d-none');
             spinner.classList.add('d-none');
         }
+
+        // ===== GESTIÓN DE CANTIDADES EN CHECKOUT =====
+        let actualizacionTimeout;
+
+        // Función para actualizar totales
+        function actualizarTotalesCheckout() {
+            let subtotal = 0;
+            
+            // Recalcular subtotal de cada producto
+            document.querySelectorAll('.quantity-checkout').forEach(input => {
+                const cantidad = parseInt(input.value) || 1;
+                const precio = parseFloat(input.dataset.price) || 0;
+                const productId = input.dataset.productId;
+                const subtotalProducto = precio * cantidad;
+                
+                // Actualizar subtotal del producto en la tabla
+                const subtotalCell = document.querySelector(`.product-total[data-product-id="${productId}"]`);
+                if (subtotalCell) {
+                    subtotalCell.textContent = '$' + subtotalProducto.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }
+                
+                subtotal += subtotalProducto;
+            });
+            
+            // Actualizar subtotal y total general
+            const subtotalFormatted = '$' + subtotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            const subtotalElement = document.querySelector('.checkout-subtotal');
+            const totalElement = document.querySelector('.checkout-total');
+            
+            if (subtotalElement) subtotalElement.textContent = subtotalFormatted;
+            if (totalElement) totalElement.textContent = subtotalFormatted;
+        }
+        
+        // Función para actualizar cantidad en el servidor
+        function actualizarCantidadServidor(productId, cantidad) {
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            console.log('📡 Enviando actualización al servidor:', productId, cantidad);
+            console.log('🔑 CSRF Token:', token);
+            console.log('🌐 URL:', '{{ route("carrito.actualizar") }}');
+            
+            return fetch('{{ route("carrito.actualizar") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: cantidad
+                })
+            })
+            .then(response => {
+                console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('✅ Respuesta JSON:', data);
+                return data;
+            })
+            .catch(error => {
+                console.error('❌ Error en petición:', error);
+                throw error;
+            });
+        }
+        
+        // Función con debounce (reducido a 150ms para mejor UX)
+        function actualizarConDebounceCheckout(productId, cantidad) {
+            clearTimeout(actualizacionTimeout);
+            
+            // Actualizar UI inmediatamente
+            actualizarTotalesCheckout();
+            
+            // Sincronizar con servidor después del debounce
+            actualizacionTimeout = setTimeout(() => {
+                actualizarCantidadServidor(productId, cantidad);
+            }, 150);
+        }
+
+        function initCheckoutQuantityControls() {
+            console.log('🔧 Inicializando controles de cantidad en checkout');
+            
+            // Event listeners para botones +/-
+            document.querySelectorAll('.quantity-plus-checkout').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const productId = this.dataset.productId;
+                    const input = document.querySelector(`.quantity-checkout[data-product-id="${productId}"]`);
+                    if (input) {
+                        const newValue = parseInt(input.value) + 1;
+                        input.value = newValue;
+                        console.log('➕ Incrementando:', productId, 'a', newValue);
+                        actualizarConDebounceCheckout(productId, newValue);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.quantity-minus-checkout').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const productId = this.dataset.productId;
+                    const input = document.querySelector(`.quantity-checkout[data-product-id="${productId}"]`);
+                    if (input && parseInt(input.value) > 1) {
+                        const newValue = parseInt(input.value) - 1;
+                        input.value = newValue;
+                        console.log('➖ Decrementando:', productId, 'a', newValue);
+                        actualizarConDebounceCheckout(productId, newValue);
+                    }
+                });
+            });
+            
+            // Event listener para cambios directos en el input
+            document.querySelectorAll('.quantity-checkout').forEach(input => {
+                input.addEventListener('change', function() {
+                    const cantidad = Math.max(1, parseInt(this.value) || 1);
+                    this.value = cantidad;
+                    console.log('🔄 Cantidad cambiada manualmente:', this.dataset.productId, 'a', cantidad);
+                    actualizarConDebounceCheckout(this.dataset.productId, cantidad);
+                });
+            });
+            
+            console.log('✅ Controles de cantidad inicializados correctamente');
+        }
     </script>
+    
+    <style>
+        /* Estilos para los botones de cantidad */
+        .quantity-minus-checkout:hover,
+        .quantity-plus-checkout:hover {
+            background: #4CAF50 !important;
+            color: #fff !important;
+            transform: scale(1.1);
+        }
+        
+        .quantity-minus-checkout:active,
+        .quantity-plus-checkout:active {
+            transform: scale(0.95);
+        }
+        
+        /* Remover flechas del input number */
+        .quantity-checkout::-webkit-outer-spin-button,
+        .quantity-checkout::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .quantity-checkout {
+            -moz-appearance: textfield;
+        }
+        
+        .quantity-checkout:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        
+        /* Animación suave para el cambio de precios */
+        .product-total,
+        .checkout-subtotal,
+        .checkout-total {
+            transition: all 0.3s ease;
+        }
+        
+        /* Hover en cada item del producto */
+        .checkout-product-item {
+            transition: all 0.3s ease;
+        }
+        
+        .checkout-product-item:hover {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+        
+        /* Sombra sutil en la imagen del producto al hacer hover */
+        .checkout-product-item:hover .product-image img {
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+            transform: scale(1.05);
+            transition: all 0.3s ease;
+        }
+        
+        .product-image img {
+            transition: all 0.3s ease;
+        }
+    </style>
 </body>
 
 </html>

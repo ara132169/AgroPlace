@@ -183,7 +183,12 @@ class CheckoutController extends Controller
 
         $cartItems = session('cart', []);
         
-        // Para pruebas: si el carrito está vacío, agregar un item de prueba
+        Log::info('🛒 CARRITO EN CHECKOUT (ANTES DE PROCESAR PAGO)', [
+            'cart_items' => $cartItems,
+            'cart_count' => count($cartItems),
+            'session_id' => session()->getId()
+        ]);
+        
         if (empty($cartItems) && request()->is('checkout-test*')) {
             // Obtener el primer producto disponible de la base de datos
             $firstProduct = \App\Models\Product::first();

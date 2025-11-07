@@ -5,26 +5,11 @@
                        <!-- <p class="welcome-msg">Welcome to Wolmart Store message or remove it!</p> -->
                     </div>
                     <div class="header-right" style="margin-top: 5px; margin-bottom: 5px;">
-                        <!--  <div class="dropdown">
-                            <a href="#currency">USD</a>
-                            <div class="dropdown-box">
-                                <a href="#USD">USD</a>
-                                <a href="#EUR">EUR</a>
-                            </div>
-                        </div>
-                         End of DropDown Menu -->
-
-                          <!--<div class="dropdown">
-                            <a href="#language"><img src="/front/assets/images/flags/eng.png" alt="ENG Flag" width="14"
-                                    height="8" class="dropdown-image" /> ESP</a>
-                            
-                        </div>-->
-                     <!--  End of Dropdown Menu -->
+                        
                         <span class="divider d-lg-show"></span>
-                        <a href="blog.html" class="d-lg-show">Blog</a>
-                        <a href="contact-us.html" class="d-lg-show">Contacto</a>
-                        <a href="my-account.html" class="d-lg-show">Mi Cuenta</a>
-                            
+           
+                        <a href="{{ route('contacto') }}" class="d-lg-show">Contacto</a>
+                       
                         @auth('client')
                         <a href="{{ route('cliente.panel') }}" class="d-lg-show login" style="text-decoration: none; color: inherit;">
                             <i class="w-icon-account"></i>Bienvenido, {{ Auth::guard('client')->user()->name }}
@@ -39,13 +24,14 @@
 
                         @guest('client')
                             @guest('seller')
-                                <a href="{{ url('/cliente/ingresar') }}" class="d-lg-show login sign-in">
-                                    <i class="w-icon-account"></i>Ingresar como usuario
-                                </a>
-                                <span class="delimiter d-lg-show">/</span>
-                                <a href="{{ url('/cliente/registrarse') }}" class="ml-0 d-lg-show login register">Registrarse</a>
+                            <a href="{{ url('/cliente/ingresar') }}" class="d-lg-show login sign-in">
+                                <i class="w-icon-account"></i>Ingresar como usuario
+                            </a>
+                            <span class="delimiter d-lg-show">/</span>
+                            <a href="{{ url('/cliente/registrarse') }}" class="ml-0 d-lg-show login register">Registrarse</a>
                             @endguest
                         @endguest
+
                     </div>
                 </div>
             </div>
@@ -56,7 +42,7 @@
                     <div class="header-left mr-md-4">
                         <a href="#" class="mobile-menu-toggle w-icon-hamburger" aria-label="menu-toggle">
                         </a>
-                        <a href="{{ url('/') }}" class="logo ml-lg-0">
+                         <a href="{{ url('/') }}" class="logo ml-lg-0">
                             <img src="{{ asset('images/site/' . get_settings()->site_logo) }}" alt="logo" width="174" height="65" />
                         </a>
                         <form method="get" action="#" class="input-wrapper header-search hs-expanded hs-round d-none d-md-flex">
@@ -68,8 +54,9 @@
                                                 @if( count($category->subcategories) > 0 )
                                                     
                                                 @endif</option>
-                                    @endforeach
-                                    @endif()   
+                                @endforeach
+                                @endif()   
+                                  
                                 </select>
                             </div>
                             <input type="text" class="form-control" name="search" id="search"
@@ -80,16 +67,20 @@
                     </div>
                     <div class="header-right ml-4">
                         <div class="header-call d-xs-show d-lg-flex align-items-center">
-                            <a href="tel:#" class="w-icon-call"></a>
+                            <a href="tel:{{ get_settings()->site_phone ?? '+52 2221123234' }}" class="w-icon-call"></a>
                             <div class="call-info d-lg-show">
                                 <h4 class="chat font-weight-normal font-size-md text-normal ls-normal text-light mb-0">
-                                    <a href="mailto:#" class="text-capitalize">¡Contáctanos!</a> </h4>
-                                <a href="tel:#" class="phone-number font-weight-bolder ls-50">+52 2221123234</a>
+                                    <a href="mailto:{{ get_settings()->site_email ?? 'info@agromarketplace.com' }}" class="text-capitalize">¡Contáctanos!</a> 
+                                </h4>
+                                <a href="tel:{{ get_settings()->site_phone ?? '+52 2221123234' }}" class="phone-number font-weight-bolder ls-50">{{ get_settings()->site_phone ?? '+52 2221123234' }}</a>
                             </div>
                         </div>
-                       
-                       
-                         <div class="dropdown cart-dropdown cart-offcanvas mr-0 mr-lg-2">
+                        <!-- <a class="wishlist label-down link d-xs-show" href="#">
+                            <i class="w-icon-heart"></i>
+                            <span class="wishlist-label d-lg-show">Lista de deseo</span>
+                        </a> -->
+
+                        <div class="dropdown cart-dropdown cart-offcanvas mr-0 mr-lg-2">
                     <div class="cart-overlay"></div>
                     <a href="{{ route('cliente.carrito') }}" class="cart-toggle label-down link">
                         <i class="w-icon-cart">
@@ -159,11 +150,7 @@
                         </div>
                     </div>
     </div>
-                      
-
-
-                            <!-- End of Dropdown Box -->
-                        </div>
+                        <!-- End of Cart Dropdown -->   
                     </div>
                 </div>
             </div>
@@ -187,7 +174,13 @@
                                     <ul class="menu vertical-menu category-menu">
                                     <li>
                                             <a href="{{ route('categoria.productos', ['slug' => $category->category_slug]) }}">
-                                                <i class="/images/categories/{{$category->category_image}}"></i>  {{$category->category_name}}
+                                                @php $categoryImage = get_category_image($category); @endphp
+                                                @if($categoryImage)
+                                                    <img src="{{ $categoryImage }}" alt="{{ $category->category_name }}" width="24" height="24" style="margin-right: 8px; vertical-align: middle;">
+                                                @else
+                                                    <i class="w-icon-category" style="margin-right: 8px; font-size: 18px; vertical-align: middle;"></i>
+                                                @endif
+                                                {{$category->category_name}}
                                                 @if( count($category->subcategories) > 0 )
                                                 @endif
                                             </a>
@@ -198,12 +191,16 @@
                                                
                                                @if($subcategory->is_child_of == 0)
                                                 <li>
-                                                    <h4 class="menu-title">{{ $subcategory->subcategory_name }}</h4>
+                                                    <h4 class="menu-title">
+                                                        <a href="{{ route('subcategoria', ['categorySlug' => $category->category_slug, 'subcategorySlug' => $subcategory->subcategory_slug]) }}">
+                                                            {{ $subcategory->subcategory_name }}
+                                                        </a>
+                                                    </h4>
                                                     <hr class="divider">
                                                     @if(!empty($subcategory->children) && $subcategory->children->count())
                                                     <ul>
                                                     @foreach($subcategory->children as $child_subcategory)
-                                                        <li><a href="{{ route('subcategoria.productos', ['slug' => $child_subcategory->subcategory_slug]) }}">{{ $child_subcategory->subcategory_name }}</a>
+                                                        <li><a href="{{ route('subsubcategoria', ['categorySlug' => $category->category_slug, 'subcategorySlug' => $subcategory->subcategory_slug, 'subsubcategorySlug' => $child_subcategory->subcategory_slug]) }}">{{ $child_subcategory->subcategory_name }}</a>
                                                         </li>
                                                     @endforeach
                                                     </ul>
@@ -235,10 +232,7 @@
                                         <a href="{{ route('tiendas.index') }}">Tiendas</a>
                                        
                                     </li>
-                                    <li class="{{request()->is('blog*') ? 'active' : ''}}">
-                                        <a href="blog-mask-grid.html">Blog</a>
-                                        
-                                    </li>
+                                
                                     <li class="{{request()->is('nosotros*') ? 'active' : ''}}">
                                         <a href="{{ url('nosotros') }}">Nosotros</a>
                                         
@@ -251,7 +245,7 @@
                             </nav>
                         </div>
                         <div class="header-right">
-                            <a href="become-a-vendor.html" class="d-xl-show"><i class="w-icon-user mr-1"></i>Únete a nuestra plataforma</a>
+                            <a href="{{ url('/tienda/registrarse') }}" class="d-xl-show"><i class="w-icon-user mr-1"></i>Únete a nuestra plataforma</a>
                             
                         </div>
                     </div>

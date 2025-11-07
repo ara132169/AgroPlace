@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Models\SubCategory;
-use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use Illuminate\Http\Request;
 use App\Rules\ValidatePrice;
 use Illuminate\Support\Facades\File;
 
@@ -338,10 +338,77 @@ public function editProduct(Request $request){
     
     public function productosPorSubcategoria($slug)
     {
-        $subcategoria = Subcategory::where('subcategory_slug', $slug)->firstOrFail();
-        $productos = Subcategory::all();
-    
-        return view('front.layout.pages.subcategorias', compact('subcategoria', 'productos'));
+        try {
+            // Debug: Log para verificar que el método se ejecuta
+            \Log::info('=== INICIO DEBUG SUBCATEGORÍA ===');
+            \Log::info('Slug recibido: ' . $slug);
+            
+            // Buscar la subcategoría por slug
+            $subcategoria = SubCategory::where('subcategory_slug', $slug)->first();
+            \Log::info('Subcategoría encontrada: ' . ($subcategoria ? 'SÍ' : 'NO'));
+            
+            if (!$subcategoria) {
+                \Log::error('Subcategoría no encontrada: ' . $slug);
+                abort(404, 'Subcategoría no encontrada');
+            }
+            
+            \Log::info('Subcategoría: ' . $subcategoria->subcategory_name . ' (ID: ' . $subcategoria->id . ')');
+            
+            // Obtener la categoría padre
+            $categoria = Category::find($subcategoria->category_id);
+            \Log::info('Categoría encontrada: ' . ($categoria ? 'SÍ - ' . $categoria->category_name : 'NO'));
+            
+            if (!$categoria) {
+                \Log::error('Categoría padre no encontrada para subcategoría: ' . $slug);
+                abort(404, 'Categoría no encontrada');
+            }
+            
+            // Contar productos antes de paginar
+            $totalProductos = Product::where('subcategory', $subcategoria->id)
+                ->where('visibility', 1)
+                ->count();
+            \Log::info('Total productos en subcategoría: ' . $totalProductos);
+            
+            // Obtener los productos de esta subcategoría
+            $productos = Product::with(['category', 'seller'])
+                ->where('subcategory', $subcategoria->id)
+                ->where('visibility', 1)
+                ->paginate(12);
+            
+            \Log::info('Productos paginados: ' . $productos->count());
+            
+            // Variables simples para evitar errores
+            $productosConDescuento = collect([]);
+            $vendedores = collect([]);
+            $recomendaciones = collect([]);
+            $recientes = collect([]);
+            $productosVistos = collect([]);
+            
+            $pageTitle = 'Productos - ' . $subcategoria->subcategory_name;
+            
+            \Log::info('=== INTENTANDO RETORNAR VISTA ===');
+            
+            return view('front.layout.subcategoria', compact(
+                'subcategoria', 
+                'categoria', 
+                'productos', 
+                'productosConDescuento', 
+                'vendedores', 
+                'recomendaciones', 
+                'recientes', 
+                'productosVistos', 
+                'pageTitle'
+            ));
+            
+        } catch (\Exception $e) {
+            \Log::error('=== ERROR EN CONTROLADOR ===');
+            \Log::error('Mensaje: ' . $e->getMessage());
+            \Log::error('Archivo: ' . $e->getFile() . ':' . $e->getLine());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            // Retornar el error para debugging
+            return response('Error: ' . $e->getMessage() . ' en ' . $e->getFile() . ':' . $e->getLine(), 500);
+        }
     }
 
 

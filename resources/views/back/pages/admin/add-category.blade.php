@@ -50,7 +50,7 @@
                         <div class="col-md-7">
                             <div class="form-group">
                                 <label for="">Icono de categoría</label>
-                                <input type="file" name="category_image" id="" class="form-control">
+                                <input type="file" name="category_image" id="category_image_input" class="form-control" accept="image/*">
                                 @error('category_image')
                                     <span class="text-danger ml-2">
                                         {{ $message }}
@@ -58,7 +58,7 @@
                                 @enderror
                             </div>
                             <div class="avatar mb-3">
-                                <img src="" alt="" data-ijabo-default-img="" width="50" height="50" id="category_image_preview">
+                                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjRjBGMEYwIi8+CjxwYXRoIGQ9Ik0yNSAxNUM4LjQzIDI1IDI1IDMxLjU3IDI1IDI1WiIgZmlsbD0iIzk5OTk5OSIvPgo8L3N2Zz4K" alt="Vista previa" width="50" height="50" id="category_image_preview" style="border: 1px solid #ddd; border-radius: 4px; object-fit: cover;">
                             </div>
                         </div>
                     </div>
@@ -80,7 +80,21 @@
             onInvalidType:function(message,element){
                 alert(message);
             },
-            onSuccess:function(message,element){}
+            onSuccess:function(message,element){
+                console.log('Imagen cargada correctamente');
+            }
+        });
+
+        // Fallback para mostrar imagen seleccionada
+        $('#category_image_input').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#category_image_preview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
         });
     </script>
 @endpush

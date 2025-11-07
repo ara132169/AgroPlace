@@ -33,7 +33,7 @@
                                             <tr data-index="{{ $item->id }}" data-ordering="{{ $item->ordering }}">
                                                 <td>
                                                     <div class="avatar mr-2">
-                                                        <img src="/images/categories/{{ $item->category_image }}" width="50" height="50" alt="">
+                                                        <img src="{{ asset('images/categories/' . $item->category_image) }}" width="50" height="50" alt="{{ $item->category_name }}">
                                                     </div>
                                                 </td>
                                                 <td>

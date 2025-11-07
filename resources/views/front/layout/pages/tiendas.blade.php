@@ -586,7 +586,7 @@
                                 <i class="fas fa-store-slash"></i>
                                 <h3>No hay tiendas disponibles</h3>
                                 <p>Aún no se han registrado tiendas en la plataforma.</p>
-                                <a href="{{ route('seller.register') }}" class="btn btn-primary btn-rounded">
+                                <a href="{{ route('tienda.registrarse') }}" class="btn btn-primary btn-rounded">
                                     <i class="fas fa-plus me-1"></i>Registrar tu Tienda
                                 </a>
                             </div>

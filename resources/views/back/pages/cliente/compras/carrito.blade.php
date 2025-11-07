@@ -78,7 +78,7 @@
                                         <td class="product-price"><span class="amount">${{ number_format($item['price'], 2) }}</span></td>
                                         <td class="product-quantity">
                                             <div class="input-group">
-                                                <input class="quantity form-control" type="number" min="1" max="100000" value="{{ $item['quantity'] }}">
+                                                <input class="quantity form-control" type="number" min="1" max="100000" value="{{ $item['quantity'] }}" data-product-id="{{ $id }}">
                                                 <button class="quantity-plus w-icon-plus"></button>
                                                 <button class="quantity-minus w-icon-minus"></button>
                                             </div>
@@ -101,11 +101,7 @@
                                 <button type="submit" class="btn btn-rounded btn-update disabled" name="update_cart" value="Update Cart">Actualizar carrito</button>
                             </div>
 
-                            <form class="coupon">
-                                <h5 class="title coupon-title font-weight-bold text-uppercase">Cupón de descuento</h5>
-                                <input type="text" class="form-control mb-4" placeholder="Enter coupon code here..." required />
-                                <button class="btn btn-dark btn-outline btn-rounded">Aplicar cupón</button>
-                            </form>
+                           
                         </div>
                         <div class="col-lg-4 sticky-sidebar-wrapper">
                             <div class="sticky-sidebar">
@@ -118,78 +114,7 @@
 
                                     <hr class="divider">
 
-                                    <ul class="shipping-methods mb-2">
-                                        <li>
-                                            <label
-                                                class="shipping-title text-dark font-weight-bold">Envío</label>
-                                        </li>
-                                        <li>
-                                            <div class="custom-radio">
-                                                <input type="radio" id="free-shipping" class="custom-control-input"
-                                                    name="shipping">
-                                                <label for="free-shipping"
-                                                    class="custom-control-label color-dark">Envío
-                                                    gratis</label>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="custom-radio">
-                                                <input type="radio" id="local-pickup" class="custom-control-input"
-                                                    name="shipping">
-                                                <label for="local-pickup"
-                                                    class="custom-control-label color-dark">Recogida
-                                                    local</label>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="custom-radio">
-                                                <input type="radio" id="flat-rate" class="custom-control-input"
-                                                    name="shipping">
-                                                <label for="flat-rate" class="custom-control-label color-dark">Tarifa
-                                                    
-                                                    </label>
-                                            </div>
-                                        </li>
-                                    </ul>
-
-                                   <!-- <div class="shipping-calculator">-->
-                                        <p class="shipping-destination lh-1">Shipping to <strong>CA</strong>.</p>
-
-                                        <form class="shipping-calculator-form">
-                                            <div class="form-group">
-                                                <div class="select-box">
-                                                    <select name="country" class="form-control form-control-md">
-                                                        <option value="default" selected="selected">United States
-                                                            (US)
-                                                        </option>
-                                                        <option value="us">United States</option>
-                                                        <option value="uk">United Kingdom</option>
-                                                        <option value="fr">France</option>
-                                                        <option value="aus">Australia</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="select-box">
-                                                    <select name="state" class="form-control form-control-md">
-                                                        <option value="default" selected="selected">California
-                                                        </option>
-                                                        <option value="ohaio">Ohaio</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <input class="form-control form-control-md" type="text"
-                                                    name="town-city" placeholder="Town / City">
-                                            </div>
-                                            <div class="form-group">
-                                                <input class="form-control form-control-md" type="text"
-                                                    name="zipcode" placeholder="ZIP">
-                                            </div>
-                                            <button type="submit" class="btn btn-dark btn-outline btn-rounded">Actualizar
-                                                Total</button>
-                                        </form>
-                                    </div>
+                                
 
                                     <hr class="divider mb-6">
                                     <div class="order-total d-flex justify-content-between align-items-center">
@@ -245,175 +170,6 @@
     </div>
     <!-- End of Newsletter popup -->
 
-    <!-- Start of Quick View -->
-    <div class="product product-single product-popup">
-        <div class="row gutter-lg">
-            <div class="col-md-6 mb-4 mb-md-0">
-                <div class="product-gallery product-gallery-sticky">
-                    <div class="swiper-container product-single-swiper swiper-theme nav-inner">
-                        <div class="swiper-wrapper row cols-1 gutter-no">
-                            <div class="swiper-slide">
-                                <figure class="product-image">
-                                    <img src="/front/assets/images/products/popup/1-440x494.jpg"
-                                        data-zoom-image="/front/assets/images/products/popup/1-800x900.jpg"
-                                        alt="Water Boil Black Utensil" width="800" height="900">
-                                </figure>
-                            </div>
-                            <div class="swiper-slide">
-                                <figure class="product-image">
-                                    <img src="/front/assets/images/products/popup/2-440x494.jpg"
-                                        data-zoom-image="/front/assets/images/products/popup/2-800x900.jpg"
-                                        alt="Water Boil Black Utensil" width="800" height="900">
-                                </figure>
-                            </div>
-                            <div class="swiper-slide">
-                                <figure class="product-image">
-                                    <img src="/front/assets/images/products/popup/3-440x494.jpg"
-                                        data-zoom-image="/front/assets/images/products/popup/3-800x900.jpg"
-                                        alt="Water Boil Black Utensil" width="800" height="900">
-                                </figure>
-                            </div>
-                            <div class="swiper-slide">
-                                <figure class="product-image">
-                                    <img src="/front/assets/images/products/popup/4-440x494.jpg"
-                                        data-zoom-image="/front/assets/images/products/popup/4-800x900.jpg"
-                                        alt="Water Boil Black Utensil" width="800" height="900">
-                                </figure>
-                            </div>
-                        </div>
-                        <button class="swiper-button-next"></button>
-                        <button class="swiper-button-prev"></button>
-                    </div>
-                    <div class="product-thumbs-wrap swiper-container" data-swiper-options="{
-                        'navigation': {
-                            'nextEl': '.swiper-button-next',
-                            'prevEl': '.swiper-button-prev'
-                        }
-                    }">
-                        <div class="product-thumbs swiper-wrapper row cols-4 gutter-sm">
-                            <div class="product-thumb swiper-slide">
-                                <img src="/front/assets/images/products/popup/1-103x116.jpg" alt="Product Thumb" width="103"
-                                    height="116">
-                            </div>
-                            <div class="product-thumb swiper-slide">
-                                <img src="/front/assets/images/products/popup/2-103x116.jpg" alt="Product Thumb" width="103"
-                                    height="116">
-                            </div>
-                            <div class="product-thumb swiper-slide">
-                                <img src="/front/assets/images/products/popup/3-103x116.jpg" alt="Product Thumb" width="103"
-                                    height="116">
-                            </div>
-                            <div class="product-thumb swiper-slide">
-                                <img src="/front/assets/images/products/popup/4-103x116.jpg" alt="Product Thumb" width="103"
-                                    height="116">
-                            </div>
-                        </div>
-                        <button class="swiper-button-next"></button>
-                        <button class="swiper-button-prev"></button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 overflow-hidden p-relative">
-                <div class="product-details scrollable pl-0">
-                    <h2 class="product-title">Electronics Black Wrist Watch</h2>
-                    <div class="product-bm-wrapper">
-                        <figure class="brand">
-                            <img src="/front/assets/images/products/brand/brand-1.jpg" alt="Brand" width="102" height="48" />
-                        </figure>
-                        <div class="product-meta">
-                            <div class="product-categories">
-                                Category:
-                                <span class="product-category"><a href="#">Electronics</a></span>
-                            </div>
-                            <div class="product-sku">
-                                SKU: <span>MS46891340</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="product-divider">
-
-                    <div class="product-price">$40.00</div>
-
-                    <div class="ratings-container">
-                        <div class="ratings-full">
-                            <span class="ratings" style="width: 80%;"></span>
-                            <span class="tooltiptext tooltip-top"></span>
-                        </div>
-                        <a href="#" class="rating-reviews">(3 Reviews)</a>
-                    </div>
-
-                    <div class="product-short-desc">
-                        <ul class="list-type-check list-style-none">
-                            <li>Ultrices eros in cursus turpis massa cursus mattis.</li>
-                            <li>Volutpat ac tincidunt vitae semper quis lectus.</li>
-                            <li>Aliquam id diam maecenas ultricies mi eget mauris.</li>
-                        </ul>
-                    </div>
-
-                    <hr class="product-divider">
-
-                    <div class="product-form product-variation-form product-color-swatch">
-                        <label>Color:</label>
-                        <div class="d-flex align-items-center product-variations">
-                            <a href="#" class="color" style="background-color: #ffcc01"></a>
-                            <a href="#" class="color" style="background-color: #ca6d00;"></a>
-                            <a href="#" class="color" style="background-color: #1c93cb;"></a>
-                            <a href="#" class="color" style="background-color: #ccc;"></a>
-                            <a href="#" class="color" style="background-color: #333;"></a>
-                        </div>
-                    </div>
-                    <div class="product-form product-variation-form product-size-swatch">
-                        <label class="mb-1">Size:</label>
-                        <div class="flex-wrap d-flex align-items-center product-variations">
-                            <a href="#" class="size">Small</a>
-                            <a href="#" class="size">Medium</a>
-                            <a href="#" class="size">Large</a>
-                            <a href="#" class="size">Extra Large</a>
-                        </div>
-                        <a href="#" class="product-variation-clean">Clean All</a>
-                    </div>
-
-                    <div class="product-variation-price">
-                        <span></span>
-                    </div>
-
-                    <div class="product-form">
-                        <div class="product-qty-form">
-                            <div class="input-group">
-                                <input class="quantity form-control" type="number" min="1" max="10000000">
-                                <button class="quantity-plus w-icon-plus"></button>
-                                <button class="quantity-minus w-icon-minus"></button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-cart">
-                            <i class="w-icon-cart"></i>
-                            <span>Add to Cart</span>
-                        </button>
-                    </div>
-
-                    <div class="social-links-wrapper">
-                        <div class="social-links">
-                            <div class="social-icons social-no-color border-thin">
-                                <a href="#" class="social-icon social-facebook w-icon-facebook"></a>
-                                <a href="#" class="social-icon social-twitter w-icon-twitter"></a>
-                                <a href="#" class="social-icon social-pinterest fab fa-pinterest-p"></a>
-                                <a href="#" class="social-icon social-whatsapp fab fa-whatsapp"></a>
-                                <a href="#" class="social-icon social-youtube fab fa-linkedin-in"></a>
-                            </div>
-                        </div>
-                        <span class="divider d-xs-show"></span>
-                        <div class="product-link-wrapper d-flex">
-                            <a href="#" class="btn-product-icon btn-wishlist w-icon-heart"><span></span></a>
-                            <a href="#"
-                                class="btn-product-icon btn-compare btn-icon-left w-icon-compare"><span></span></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End of Quick view -->
 
     <script src="/front/assets/vendor/jquery/jquery.min.js"></script>
     <script src="/front/assets/vendor/swiper/swiper-bundle.min.js"></script>
@@ -427,6 +183,86 @@
 
     <!-- Main JS -->
     <script src="/front/assets/js/main.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+        let actualizacionTimeout;
+        
+        // Función para actualizar los totales
+        function actualizarTotales() {
+            let subtotalGeneral = 0;
+            
+            // Recorrer cada fila del carrito
+            $('table.cart-table tbody tr').each(function() {
+                let $row = $(this);
+                let $input = $row.find('input.quantity');
+                
+                if ($input.length > 0) {
+                    let cantidad = parseInt($input.val()) || 0;
+                    let precioTexto = $row.find('.product-price .amount').text().replace('$', '').replace(',', '');
+                    let precio = parseFloat(precioTexto) || 0;
+                    let subtotal = precio * cantidad;
+                    
+                    // Actualizar subtotal de la fila
+                    $row.find('.product-subtotal .amount').text('$' + subtotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                    
+                    subtotalGeneral += subtotal;
+                }
+            });
+            
+            // Actualizar subtotal general y total
+            $('.cart-subtotal span').text('$' + subtotalGeneral.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+            $('.order-total span').text('$' + subtotalGeneral.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+        }
+        
+        // Función para actualizar cantidad en el servidor
+        function actualizarCantidadEnServidor($input) {
+            let productId = $input.data('product-id');
+            let cantidad = parseInt($input.val()) || 1;
+            
+            console.log('Actualizando producto:', productId, 'cantidad:', cantidad);
+            
+            $.ajax({
+                url: '{{ route("carrito.actualizar") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    product_id: productId,
+                    quantity: cantidad
+                },
+                success: function(response) {
+                    console.log('✓ Cantidad actualizada en el servidor:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('✗ Error al actualizar cantidad:', error);
+                    console.error('Respuesta del servidor:', xhr.responseText);
+                }
+            });
+        }
+        
+        // Función con debounce para evitar múltiples llamadas
+        function actualizarConDebounce($input) {
+            clearTimeout(actualizacionTimeout);
+            actualizacionTimeout = setTimeout(function() {
+                actualizarTotales();
+                actualizarCantidadEnServidor($input);
+            }, 300); // Esperar 300ms después del último cambio
+        }
+        
+        // Observar cambios en los inputs de cantidad
+        $(document).on('input change', 'input.quantity', function() {
+            actualizarConDebounce($(this));
+        });
+        
+        // También observar clics en los botones
+        $(document).on('click', '.quantity-plus, .quantity-minus', function() {
+            let $input = $(this).siblings('input.quantity');
+            setTimeout(function() {
+                actualizarConDebounce($input);
+            }, 100);
+        });
+    });
+    </script>
 </body>
 
 </html>

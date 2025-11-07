@@ -126,7 +126,11 @@ class CartController extends Controller
             ->get();
 
         $total = $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
+            // Verificar que el producto existe antes de acceder a la propiedad
+            if ($item->product) {
+                return $item->product->price * $item->quantity;
+            }
+            return 0;
         });
 
         return view('front.layout.pages.cliente.carrito.index', compact('cartItems', 'total'));

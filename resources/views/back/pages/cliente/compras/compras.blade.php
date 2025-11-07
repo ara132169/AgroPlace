@@ -267,11 +267,11 @@
         <table class="orders-table">
             <thead>
                 <tr>
-                    <th>Order</th>
-                    <th>Date</th>
-                    <th>Status</th>
+                    <th>Orden</th>
+                    <th>Fecha</th>
+                    <th>Estado  </th>
                     <th>Total</th>
-                    <th>Actions</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -309,7 +309,7 @@
                     </td>
                     <td data-label="Actions">
                         <a href="{{ route('cliente.pedido.detalle', $compra->id) }}" class="btn-view">
-                            VIEW
+                            VER
                         </a>
                     </td>
                 </tr>
@@ -319,7 +319,7 @@
 
         <!-- Botón GO SHOP -->
         <a href="{{ route('productos.index') }}" class="btn-go-shop">
-            <span>GO SHOP</span>
+            <span>IR A LA TIENDA</span>
             <i class="fa fa-arrow-right"></i>
         </a>
     @else
@@ -329,7 +329,7 @@
             <h3>No tienes compras todavia!</h3>
             <p>Explora nuestro catálogo y realiza tu primera compra.</p>
             <a href="{{ route('productos.index') }}" class="btn-go-shop">
-                <span>GO SHOP</span>
+                <span>IR A LA TIENDA</span>
                 <i class="fa fa-arrow-right"></i>
             </a>
         </div>

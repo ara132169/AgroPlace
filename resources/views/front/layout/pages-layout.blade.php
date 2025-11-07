@@ -281,6 +281,7 @@
                     </div>
                     <!-- End of Category Banner 3Cols -->
 
+                    @if(isset($productosConDescuento) && $productosConDescuento->count() > 0)
                     <div class="title-link-wrapper title-deals appear-animate">
                         <h2 class="title">Ofertas del dia</h2>
                         <a href="shop-boxed-banner.html" class="font-weight-bold ls-25">Ver más productos<i
@@ -327,6 +328,7 @@
                     </div>
                     @endforeach   
                     </div>
+                    @endif
                     <!-- End of Product List -->
 
                     <div class="title-link-wrapper title-deals appear-animate">
@@ -362,8 +364,7 @@
                     </div>
                     <!-- End of Product Widget -->
 
-                    
-
+                    @if(isset($vendedores) && $vendedores->count() > 0)
                     <h2 class="title title-underline pt-1 mb-4 appear-animate">Vendedores Recientes</h2>
                     <div class="swiper-container swiper-theme shadow-swiper vendor-wrapper appear-animate"
                         data-swiper-options="{
@@ -388,7 +389,7 @@
                            
                                 <div class="vendor-widget-banner border-no">
                                     <figure class="vendor-banner">
-                                        <a href="{{ route('perfil.vendedor', $producto->seller->username) }}">
+                                        <a href="{{ route('perfil.vendedor', $vendedor->username) }}">
                                         <img src="{{ $vendedor->shop && $vendedor->shop->shop_banner ? asset('images/shop/' . $vendedor->shop->shop_banner) : asset('images/shop/banner.webp') }}"
                                         alt="Banner de {{ $vendedor->username }}"
                                         width="625" height="300" style="background-color: #EFF0F2;" />
@@ -398,7 +399,7 @@
                                  
                                         <figure class="vendor-logo">
                                         
-                                        <a href="{{ route('perfil.vendedor', $producto->seller->username) }}">
+                                        <a href="{{ route('perfil.vendedor', $vendedor->username) }}">
                                         <img src="{{ $vendedor->shop && $vendedor->shop->shop_logo ? asset('images/shop/' . $vendedor->shop->shop_logo) : asset('images/users/default-avatar.png') }}" 
                                         alt="Logo de {{ $vendedor->username }}"
                                         width="90" height="90" />
@@ -410,7 +411,7 @@
                                             <a href="#">{{ $vendedor->username }}</a>
                                             </h4>
                                      
-                                            <a href="{{ route('perfil.vendedor', $producto->seller->username) }}" class="visit-vendor-btn text-dark">Visitar perfil</a>
+                                            <a href="{{ route('perfil.vendedor', $vendedor->username) }}" class="visit-vendor-btn text-dark">Visitar perfil</a>
                                         </div>
                             
                                     </div>
@@ -422,6 +423,7 @@
                         </div>
                         <div class="swiper-pagination"></div>
                     </div>
+                    @endif
                     <!-- End of Vendor -->
 
         
@@ -632,6 +634,7 @@
                         <div class="col-lg-3 col-sm-6 mb-6">
                         <h4 class="title title-underline mb-2 pt-1">Recomendaciones</h4>
                         <div class="widget widget-products">
+                            @if(isset($recomendaciones) && $recomendaciones->count() > 0)
                             @foreach($recomendaciones as $producto)
                                 <div class="product product-widget mb-2">
                                     <figure class="product-media">
@@ -659,10 +662,12 @@
                                     </div>
                                 </div>
                             @endforeach
+                            @endif
                         </div> </div>
 
                         <div class="col-lg-3 col-sm-6 mb-6">
                             <h4 class="title title-underline mb-2 pt-1">Recientes</h4>
+                            @if(isset($recientes) && $recientes->count() > 0)
                             @foreach ($recientes as $reciente)
                             <div class="widget widget-products">
                                 <div class="product product-widget">
@@ -675,7 +680,7 @@
                                   
                                     <div class="product-details">
                                         <h4 class="product-name">
-                                            <a href="{{ route('producto.index', $reciente->slug) }}">{{ $producto->name }}</a>
+                                            <a href="{{ route('producto.index', $reciente->slug) }}">{{ $reciente->name }}</a>
                                         </h4>
                                         <div class="ratings-container">
                                             <div class="ratings-full">
@@ -684,13 +689,19 @@
                                             </div>
                                         </div>
                                         <div class="product-price">
-                                            <ins class="new-price">${{ $producto->compare_price }}</ins><del class="old-price">${{ $producto->price }}</del>
+                                            @if($reciente->compare_price)
+                                                <ins class="new-price">${{ number_format($reciente->compare_price, 2) }}</ins>
+                                                <del class="old-price">${{ number_format($reciente->price, 2) }}</del>
+                                            @else
+                                                <ins class="new-price">${{ number_format($reciente->price, 2) }}</ins>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
                                 <!-- End of Product Widget -->
                             </div>
                             @endforeach
+                            @endif
                             <!-- End of Widget Products -->
                         </div>
                         <!-- End of Col -->
@@ -698,6 +709,7 @@
                         <div class="col-lg-3 col-sm-6 mb-6">
                         <h4 class="title title-underline mb-2 pt-1">Promociones</h4>
                         <div class="widget widget-products">
+                            @if(isset($productosConDescuento) && $productosConDescuento->count() > 0)
                             @foreach($productosConDescuento as $producto)
                                 <div class="product product-widget mb-2">
                                     <figure class="product-media">
@@ -730,6 +742,7 @@
                                     </div>
                                 </div>
                             @endforeach
+                            @endif
                         </div>
                     </div>
                     <!-- End of Row -->
@@ -845,7 +858,7 @@
                             }
                         }
                     }">
-                    @if($productosVistos->isNotEmpty())
+                    @if(isset($productosVistos) && $productosVistos->isNotEmpty())
                         <div class="swiper-wrapper row cols-xl-8 cols-lg-6 cols-md-4 cols-2 mt-5">
                             @foreach($productosVistos as $producto)
                             <div class="swiper-slide product-wrap mb-0">

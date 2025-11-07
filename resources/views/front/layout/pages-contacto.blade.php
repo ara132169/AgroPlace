@@ -3,6 +3,57 @@
 
 <head>
 @include('front.layout.inc.head')
+<style>
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        position: relative;
+    }
+    .alert-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
+    .alert-dismissible {
+        padding-right: 35px;
+    }
+    .btn-close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 2;
+        padding: 1.25rem 1rem;
+        color: inherit;
+        background: transparent;
+        border: 0;
+        font-size: 1.125rem;
+        cursor: pointer;
+    }
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+    .invalid-feedback {
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+        display: block;
+    }
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .form-group label {
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+</style>
 </head>
 
 <body>
@@ -66,7 +117,7 @@
                                     </span>
                                     <div class="icon-box-content">
                                         <h4 class="icon-box-title">Correo Electrónico</h4>
-                                        <p>contacto@agroplace.com</p>
+                                        <p>{{ get_settings()->site_email ?? 'contacto@agroplace.com' }}</p>
                                     </div>
                                 </div>
                                 <div class="swiper-slide icon-box text-center icon-box-primary">
@@ -75,7 +126,7 @@
                                     </span>
                                     <div class="icon-box-content">
                                         <h4 class="icon-box-title">WhatsApp</h4>
-                                        <p>(123) 456-9870</p>
+                                        <p>{{ get_settings()->site_phone ?? '(123) 456-9870' }}</p>
                                     </div>
                                 </div>
                                 <div class="swiper-slide icon-box text-center icon-box-primary">
@@ -84,7 +135,7 @@
                                     </span>
                                     <div class="icon-box-content">
                                         <h4 class="icon-box-title">Ubicación</h4>
-                                        <p>México</p>
+                                        <p>{{ get_settings()->site_address ?? 'México' }}</p>
                                     </div>
                                 </div>
                                 <div class="swiper-slide icon-box text-center icon-box-primary">
@@ -165,23 +216,53 @@
                             </div>
                             <div class="col-lg-6 mb-8">
                                 <h4 class="title mb-3">Envianos un mensaje</h4>
-                                <form class="form contact-us-form" action="#" method="post">
+                                
+                                @if (session('success'))
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        {{ session('success') }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                @endif
+
+                                @if (session('error'))
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        {{ session('error') }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                @endif
+                                
+                                <form class="form contact-us-form" action="{{ route('contacto.enviar') }}" method="post">
+                                    @csrf
                                     <div class="form-group">
-                                        <label for="username">Nombre completo</label>
+                                        <label for="username">Nombre completo *</label>
                                         <input type="text" id="username" name="username"
-                                            class="form-control">
+                                            class="form-control @error('username') is-invalid @enderror"
+                                            value="{{ old('username') }}" required>
+                                        @error('username')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
-                                        <label for="email_1">Correo electrónico</label>
+                                        <label for="email_1">Correo electrónico *</label>
                                         <input type="email" id="email_1" name="email_1"
-                                            class="form-control">
+                                            class="form-control @error('email_1') is-invalid @enderror"
+                                            value="{{ old('email_1') }}" required>
+                                        @error('email_1')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
-                                        <label for="message">Mensaje</label>
+                                        <label for="message">Mensaje *</label>
                                         <textarea id="message" name="message" cols="30" rows="5"
-                                            class="form-control"></textarea>
+                                            class="form-control @error('message') is-invalid @enderror"
+                                            required>{{ old('message') }}</textarea>
+                                        @error('message')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    <button type="submit" class="btn btn-dark btn-rounded">ENVIAR</button>
+                                    <button type="submit" class="btn btn-dark btn-rounded">
+                                        <i class="w-icon-envelop"></i> ENVIAR MENSAJE
+                                    </button>
                                 </form>
                             </div>
                         </div>
