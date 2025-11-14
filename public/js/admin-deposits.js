@@ -445,9 +445,240 @@ function showStats() {
     alert('Modal de estadísticas detalladas - En desarrollo');
 }
 
-// Función para ver detalles
+// Función para ver detalles completos del depósito
 function viewDetails(depositId) {
-    alert('Ver detalles del depósito ' + depositId + ' - En desarrollo');
+    console.log('👁️ viewDetails llamada con ID:', depositId);
+    
+    const url = `/admin/depositos/${depositId}/detalles`;
+    console.log('📡 Obteniendo detalles desde:', url);
+    
+    fetch(url)
+        .then(response => {
+            console.log('📥 Respuesta recibida:', response.status, response.statusText);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('📊 Datos recibidos:', data);
+            if (data.success) {
+                showDepositDetailsModal(data);
+            } else {
+                console.error('❌ Error en respuesta:', data);
+                alert('❌ Error: ' + (data.message || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error en fetch:', error);
+            alert('❌ Error de conexión: ' + error.message);
+        });
+}
+
+// Función para mostrar modal con detalles completos
+function showDepositDetailsModal(data) {
+    const deposit = data.deposit;
+    const accounts = data.seller_accounts;
+    
+    // Crear contenido del modal
+    const modalContent = `
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-eye"></i> Detalles del Depósito #${deposit.reference}
+                        </h5>
+                        <button type="button" class="close text-white" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Información del Vendedor -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-primary text-white">
+                                        <i class="fas fa-user"></i> Información del Vendedor
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Nombre:</strong> ${deposit.seller.name}</p>
+                                        <p><strong>Email:</strong> ${deposit.seller.email}</p>
+                                        <p><strong>ID:</strong> #${deposit.seller.id}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Información del Depósito -->
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-success text-white">
+                                        <i class="fas fa-money-bill-wave"></i> Información del Depósito
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Referencia:</strong> ${deposit.reference}</p>
+                                        <p><strong>Monto:</strong> <span class="text-success h5">$${deposit.amount}</span></p>
+                                        <p><strong>Estado:</strong> <span class="badge badge-warning">Pendiente</span></p>
+                                        ${deposit.description ? `<p><strong>Descripción:</strong> ${deposit.description}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cuenta de Destino Actual -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-warning text-dark">
+                                <i class="fas fa-credit-card"></i> Cuenta de Destino Actual
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        ${deposit.payment_account.display_info}
+                                        <br><strong>Titular:</strong> ${deposit.payment_account.account_holder_name}
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <button class="btn btn-sm btn-info" onclick="showAccountDetails(${deposit.payment_account.id})">
+                                            <i class="fas fa-info-circle"></i> Ver Detalles
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Todas las Cuentas del Vendedor -->
+                        ${accounts.length > 1 ? `
+                        <div class="card mb-3">
+                            <div class="card-header bg-secondary text-white">
+                                <i class="fas fa-list"></i> Todas las Cuentas del Vendedor (${accounts.length})
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            ${accounts.map(account => `
+                                                <tr ${account.id === deposit.payment_account.id ? 'class="table-warning"' : ''}>
+                                                    <td>
+                                                        ${account.display_info}
+                                                        <br><small class="text-muted">${account.account_holder_name}</small>
+                                                    </td>
+                                                    <td>
+                                                        ${account.is_verified ? '<span class="badge badge-success">✅ Verificada</span>' : '<span class="badge badge-warning">⚠️ Sin verificar</span>'}
+                                                    </td>
+                                                    <td>
+                                                        ${account.id === deposit.payment_account.id ? '<span class="badge badge-primary">🎯 Actual</span>' : ''}
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Acciones Disponibles -->
+                        <div class="card">
+                            <div class="card-header bg-dark text-white">
+                                <i class="fas fa-cogs"></i> Acciones Disponibles
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <button class="btn btn-warning btn-block" onclick="closeDetailsAndProcess(${deposit.id})">
+                                            <i class="fas fa-play"></i> Procesar Depósito
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-success btn-block" onclick="closeDetailsAndComplete(${deposit.id})">
+                                            <i class="fas fa-check"></i> Completar Directamente
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-info btn-block" onclick="showSellerHistory(${deposit.seller.id})">
+                                            <i class="fas fa-history"></i> Historial Vendedor
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <i class="fas fa-times"></i> Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal existente si existe
+    const existingModal = document.getElementById('detailsModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Añadir modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modalContent);
+    
+    // Mostrar modal
+    const modal = document.getElementById('detailsModal');
+    if (modal) {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            try {
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+            } catch (error) {
+                console.log('🔄 Bootstrap 5 falló, intentando jQuery...');
+                fallbackToJquery();
+            }
+        } else {
+            fallbackToJquery();
+        }
+        
+        function fallbackToJquery() {
+            if (typeof $ !== 'undefined' && $.fn.modal) {
+                $('#detailsModal').modal('show');
+            } else {
+                console.error('❌ No se puede mostrar el modal: ni Bootstrap ni jQuery disponibles');
+                modal.style.display = 'block';
+                modal.classList.add('show');
+            }
+        }
+    }
+}
+
+// Funciones auxiliares para el modal de detalles
+function closeDetailsAndProcess(depositId) {
+    closeModal('detailsModal');
+    setTimeout(() => processDeposit(depositId), 300);
+}
+
+function closeDetailsAndComplete(depositId) {
+    closeModal('detailsModal');
+    setTimeout(() => completeDepositDirect(depositId), 300);
+}
+
+function showAccountDetails(accountId) {
+    const url = `/admin/depositos/cuenta/${accountId}/detalles`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Detalles de la cuenta:\n\n' + data.admin_full_info);
+            } else {
+                alert('Error al obtener detalles de la cuenta');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error de conexión');
+        });
+}
+
+function showSellerHistory(sellerId) {
+    alert('Historial del vendedor #' + sellerId + ' - Próximamente');
 }
 
 // FUNCIONES AUXILIARES

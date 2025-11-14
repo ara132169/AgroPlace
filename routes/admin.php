@@ -71,6 +71,7 @@ Route::prefix('admin')->name('admin.')->group(function(){
                 Route::get('/depositos','index')->name('depositos');
                 Route::get('/depositos/{id}/detalles','getDepositDetails')->name('depositos.detalles');
                 Route::post('/depositos/detalles-cuenta','getAccountDetails')->name('depositos.detallesCuenta');
+                Route::get('/depositos/cuenta/{accountId}/detalles','getAccountFullDetails')->name('depositos.cuenta.detalles');
                 Route::post('/depositos/{id}/actualizar-estado','updateStatus')->name('depositos.actualizar-estado');
                 Route::post('/depositos/procesar-todos-pendientes','processAllPending')->name('depositos.procesar-todos');
                 Route::get('/cuentas-pago/pendientes','pendingAccounts')->name('cuentas-pago.pendientes');

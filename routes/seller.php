@@ -57,7 +57,9 @@ Route::prefix('tienda')->name('tienda.')->group(function(){
             });
         });
 
-        // Rutas de Stripe Connect para pagos
+        // Rutas de Stripe Connect para pagos - DESHABILITADAS TEMPORALMENTE
+        // (Stripe Connect no soporta transferencias automáticas en México)
+        /*
         Route::controller(\App\Http\Controllers\Seller\StripeConnectController::class)->group(function(){
            Route::get('/stripe/config','showConfig')->name('stripe.config');
            Route::get('/stripe/dashboard','dashboard')->name('stripe.dashboard');
@@ -66,6 +68,7 @@ Route::prefix('tienda')->name('tienda.')->group(function(){
            Route::get('/stripe/refresh','refreshAccountStatus')->name('stripe.refresh');
            Route::post('/stripe/disconnect','disconnect')->name('stripe.disconnect');
         });
+        */
 
         // Rutas de cuentas de pago manuales
         Route::controller(\App\Http\Controllers\Seller\PaymentAccountController::class)->group(function(){

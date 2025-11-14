@@ -544,7 +544,6 @@
 								</span>
 							</a>
 							<ul class="submenu">
-								<li><a href="{{ route('tienda.stripe.config') }}" class="{{ Route::is('tienda.stripe.*') ? 'active' : '' }}">🎯 Stripe Connect</a></li>
 								<li><a href="{{ route('tienda.payment.accounts') }}" class="{{ Route::is('tienda.payment.*') ? 'active' : '' }}">💳 Mis Cuentas</a></li>
 								<li><a href="{{ route('tienda.deposit.history') }}" class="{{ Route::is('tienda.deposit.*') ? 'active' : '' }}">📊 Historial Depósitos</a></li>
 							</ul>

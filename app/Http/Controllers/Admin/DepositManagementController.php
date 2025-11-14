@@ -535,4 +535,37 @@ class DepositManagementController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtener detalles completos de una cuenta de pago para admin
+     */
+    public function getAccountFullDetails($accountId)
+    {
+        try {
+            $account = SellerPaymentAccount::with('seller')->findOrFail($accountId);
+            
+            return response()->json([
+                'success' => true,
+                'admin_full_info' => $account->admin_full_info,
+                'account' => [
+                    'id' => $account->id,
+                    'seller_name' => $account->seller->name,
+                    'account_holder_name' => $account->account_holder_name,
+                    'account_type' => $account->account_type,
+                    'display_info' => $account->display_info,
+                    'is_verified' => $account->is_verified,
+                    'is_active' => $account->is_active,
+                    'created_at' => $account->created_at->format('d/m/Y H:i'),
+                    'updated_at' => $account->updated_at->format('d/m/Y H:i')
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error getting account full details: ' . $e->getMessage());
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error al obtener detalles de cuenta'
+            ], 500);
+        }
+    }
 }
