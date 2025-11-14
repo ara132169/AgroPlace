@@ -24,11 +24,11 @@
 
                         @guest('client')
                             @guest('seller')
-                            <a href="{{ url('/cliente/ingresar') }}" class="d-lg-show login sign-in">
+                            <a href="{{ route('cliente.ingresar') }}" class="d-lg-show">
                                 <i class="w-icon-account"></i>Ingresar como usuario
                             </a>
                             <span class="delimiter d-lg-show">/</span>
-                            <a href="{{ url('/cliente/registrarse') }}" class="ml-0 d-lg-show login register">Registrarse</a>
+                            <a href="{{ route('cliente.register.form') }}" class="ml-0 d-lg-show">Registrarse</a>
                             @endguest
                         @endguest
 

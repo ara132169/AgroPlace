@@ -476,6 +476,8 @@ class AdminController extends Controller
                 'orders.buyer_type',
                 'orders.shipping_address',
                 'orders.shipping_phone',
+                'orders.platform_fee',
+                'orders.seller_amount',
                 DB::raw('CASE 
                     WHEN orders.buyer_type = "client" THEN clients.name 
                     WHEN orders.buyer_type = "seller" THEN buyer_sellers.name 
@@ -503,6 +505,8 @@ class AdminController extends Controller
                 'orders.buyer_type',
                 'orders.shipping_address',
                 'orders.shipping_phone',
+                'orders.platform_fee',
+                'orders.seller_amount',
                 'clients.name',
                 'clients.email',
                 'clients.phone',

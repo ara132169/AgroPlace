@@ -1,0 +1,42 @@
+# Script para ejecutar en tinker - crear datos de prueba
+
+# Ejecutar: php artisan tinker
+# Luego copiar y pegar estas líneas:
+
+echo "=== CREANDO DATOS DE PRUEBA ===\n";
+
+$vendedor = \App\Models\Seller::first();
+if (!$vendedor) {
+    echo "No hay vendedores\n";
+} else {
+    echo "Vendedor: {$vendedor->name}\n";
+}
+
+$cuenta = \App\Models\SellerPaymentAccount::firstOrCreate(
+    ['seller_id' => $vendedor->id],
+    [
+        'account_type' => 'credit_card',
+        'account_holder_name' => $vendedor->name,
+        'masked_card_number' => '****1234',
+        'bank_name' => 'BBVA',
+        'is_verified' => true,
+        'is_active' => true
+    ]
+);
+
+echo "Cuenta: {$cuenta->display_info}\n";
+
+$deposito = \App\Models\ManualDeposit::firstOrCreate(
+    ['seller_id' => $vendedor->id, 'status' => 'pending'],
+    [
+        'payment_account_id' => $cuenta->id,
+        'amount' => 72500.00,
+        'currency' => 'MXN',
+        'description' => 'Depósito de prueba',
+        'deposit_method' => 'manual'
+    ]
+);
+
+echo "Depósito: {$deposito->reference} - ID: {$deposito->id}\n";
+
+echo "URL de prueba: http://localhost:8001/admin/depositos/{$deposito->id}/detalles\n";

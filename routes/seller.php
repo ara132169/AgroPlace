@@ -28,7 +28,7 @@ Route::prefix('tienda')->name('tienda.')->group(function(){
            Route::post('/cambiar-imagen-perfil','cambiarImagenPerfil')->name('cambiar-imagen-perfil');
            Route::get('/configuraciones-tienda','shopSettings')->name('configuraciones-tienda');
            Route::post('/configuracion-tienda','shopSetup')->name('configuracion-tienda');
-           Route::post('/change-profile-picture', [SellerController::class, 'changeProfilePicture'])->name('change-profile-picture');
+           Route::post('/change-profile-picture', 'changeProfilePicture')->name('change-profile-picture');
            
            // Rutas para ventas
            Route::get('/ventas', 'misVentas')->name('ventas');
@@ -55,6 +55,27 @@ Route::prefix('tienda')->name('tienda.')->group(function(){
                Route::post('/eliminar-producto','deleteProduct')->name('eliminar-producto');
                Route::get('/get-category-subcategories','getSubcategories')->name('get-product-subcategory');
             });
+        });
+
+        // Rutas de Stripe Connect para pagos
+        Route::controller(\App\Http\Controllers\Seller\StripeConnectController::class)->group(function(){
+           Route::get('/stripe/config','showConfig')->name('stripe.config');
+           Route::get('/stripe/dashboard','dashboard')->name('stripe.dashboard');
+           Route::post('/stripe/connect','startOnboarding')->name('stripe.connect');
+           Route::get('/stripe/success','onboardingSuccess')->name('stripe.success');
+           Route::get('/stripe/refresh','refreshAccountStatus')->name('stripe.refresh');
+           Route::post('/stripe/disconnect','disconnect')->name('stripe.disconnect');
+        });
+
+        // Rutas de cuentas de pago manuales
+        Route::controller(\App\Http\Controllers\Seller\PaymentAccountController::class)->group(function(){
+           Route::get('/payment-accounts','index')->name('payment.accounts');
+           Route::post('/payment-account','store')->name('payment.account.store');
+           Route::get('/payment-account/{id}/edit','edit')->name('payment.account.edit');
+           Route::put('/payment-account/{id}','update')->name('payment.account.update');
+           Route::delete('/payment-account/{id}','destroy')->name('payment.account.delete');
+           Route::get('/deposit-history','deposits')->name('deposit.history');
+           Route::post('/request-deposit','requestDeposit')->name('request.deposit');
         });
     });
 

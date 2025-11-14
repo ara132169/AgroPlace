@@ -3,15 +3,20 @@
 namespace App\Livewire\Client;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Client;
 
 class ClientProfile extends Component
 {
+    use WithFileUploads;
+    
     public $client, $tab = 'personal_details';
     public $name, $email, $username, $phone, $address;
     public $current_password, $new_password, $new_password_confirmation;
+    public $profilePicture;
 
     public function mount()
     {
@@ -65,6 +70,37 @@ class ClientProfile extends Component
 
         $this->reset(['current_password', 'new_password', 'new_password_confirmation']);
         session()->flash('success', 'Contraseña actualizada correctamente.');
+    }
+
+    public function updatedProfilePicture()
+    {
+        $this->validate([
+            'profilePicture' => 'image|max:2048', // Max 2MB
+        ]);
+
+        try {
+            // Eliminar imagen anterior si existe
+            if ($this->client->picture && Storage::disk('public')->exists($this->client->picture)) {
+                Storage::disk('public')->delete($this->client->picture);
+            }
+
+            // Guardar nueva imagen
+            $path = $this->profilePicture->store('client-profiles', 'public');
+            
+            // Actualizar cliente
+            $this->client->update([
+                'picture' => $path
+            ]);
+
+            // Refrescar la instancia del cliente
+            $this->client = $this->client->fresh();
+            
+            session()->flash('success', 'Foto de perfil actualizada correctamente.');
+            $this->dispatch('imageUploaded', 'Foto de perfil actualizada correctamente.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al subir la imagen. Intenta de nuevo.');
+            $this->dispatch('imageError', 'Error al subir la imagen. Intenta de nuevo.');
+        }
     }
 
     public function render()

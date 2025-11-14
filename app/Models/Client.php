@@ -84,4 +84,15 @@ class Client extends Authenticatable
     {
         return $this->hasMany(Wishlist::class);
     }
+
+    /**
+     * Accessor para obtener la URL completa de la imagen de perfil
+     */
+    public function getPictureAttribute($value)
+    {
+        if ($value && file_exists(storage_path('app/public/' . $value))) {
+            return asset('storage/' . $value);
+        }
+        return asset('back/vendors/images/avatar.png');
+    }
 }

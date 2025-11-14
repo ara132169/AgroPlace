@@ -36,7 +36,12 @@ class Seller extends Authenticatable implements CanResetPassword
         'verified',
         'status',
         'payment_method',
-        'payment_email'
+        'payment_email',
+        'stripe_account_id',
+        'stripe_account_status',
+        'stripe_charges_enabled',
+        'stripe_payouts_enabled',
+        'commission_rate'
         
     ];
 
@@ -129,6 +134,96 @@ class Seller extends Authenticatable implements CanResetPassword
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new SellerResetPasswordNotification($token, $this->email));
+    }
+
+    /**
+     * Métodos para Stripe Connect
+     */
+    public function hasStripeAccount()
+    {
+        return !empty($this->stripe_account_id);
+    }
+
+    public function isStripeAccountActive()
+    {
+        return $this->stripe_charges_enabled && $this->stripe_payouts_enabled;
+    }
+
+    public function needsStripeOnboarding()
+    {
+        return !$this->hasStripeAccount() || $this->stripe_account_status !== 'active';
+    }
+
+    public function getCommissionRate()
+    {
+        return $this->commission_rate ?? 15.00;
+    }
+
+    public function calculateSellerAmount($totalAmount)
+    {
+        $commission = $this->getCommissionRate();
+        $platformFee = $totalAmount * ($commission / 100);
+        return $totalAmount - $platformFee;
+    }
+
+    public function calculatePlatformFee($totalAmount)
+    {
+        $commission = $this->getCommissionRate();
+        return $totalAmount * ($commission / 100);
+    }
+
+    /**
+     * Cuentas de pago del vendedor
+     */
+    public function paymentAccounts()
+    {
+        return $this->hasMany(SellerPaymentAccount::class);
+    }
+
+    /**
+     * Depósitos manuales del vendedor
+     */
+    public function manualDeposits()
+    {
+        return $this->hasMany(ManualDeposit::class);
+    }
+
+    /**
+     * Cuenta de pago activa y verificada
+     */
+    public function activePaymentAccount()
+    {
+        return $this->hasOne(SellerPaymentAccount::class)
+                    ->where('is_active', true)
+                    ->where('is_verified', true);
+    }
+
+    /**
+     * Verificar si tiene cuenta de pago configurada
+     */
+    public function hasPaymentAccount()
+    {
+        return $this->paymentAccounts()->verified()->exists();
+    }
+
+    /**
+     * Balance pendiente de depósito
+     */
+    public function getPendingDepositBalance()
+    {
+        return $this->manualDeposits()
+                    ->where('status', 'pending')
+                    ->sum('amount');
+    }
+
+    /**
+     * Total depositado
+     */
+    public function getTotalDeposited()
+    {
+        return $this->manualDeposits()
+                    ->where('status', 'completed')
+                    ->sum('amount');
     }
     
 }

@@ -22,25 +22,73 @@
     </div>
 </div>
 
+{{-- Mensajes de sesión --}}
+@if (session()->has('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>¡Éxito!</strong> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if (session()->has('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>¡Error!</strong> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 @livewire('client.client-profile') {{-- Aquí iría un componente Livewire para el perfil del cliente --}}
 @endsection
 
 @push('scripts')
 <script>
-    $('input[type="file"][name="clientProfilePicture"][id="clientProfilePicture"]').ijaboCropTool({
-        preview : '#clientProfilePicture',
-        setRatio: 1,
-        allowedExtensions: ['jpg', 'jpeg', 'png'],
-        buttonsText: ['CROP','QUIT'],
-        buttonsColor: ['#30bf7d','#ee5155'],
-        processUrl: '', // Puedes agregar URL para procesamiento
-        withCSRF: ['_token','{{ csrf_token() }}'],
-        onSuccess: function(message, element, status){
-            toastr.success(message);
-        },
-        onError: function(message, element, status){
-            toastr.error(message);
+    // Manejo de cambio de imagen de perfil con Livewire
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('clientProfilePicture');
+        const preview = document.getElementById('clientProfilePicturePreview');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validar que sea una imagen
+                    if (!file.type.startsWith('image/')) {
+                        alert('Por favor selecciona un archivo de imagen válido.');
+                        this.value = ''; // Limpiar el input
+                        return;
+                    }
+                    
+                    // Validar tamaño (max 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('El archivo es demasiado grande. El máximo permitido es 2MB.');
+                        this.value = ''; // Limpiar el input
+                        return;
+                    }
+                    
+                    // Mostrar preview inmediato
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (preview) {
+                            preview.src = e.target.result;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Livewire se encarga del resto automáticamente
+                }
+            });
         }
+    });
+
+    // Escuchar eventos de Livewire para mostrar mensajes
+    document.addEventListener('livewire:load', function () {
+        Livewire.on('imageUploaded', message => {
+            toastr.success(message);
+        });
+        
+        Livewire.on('imageError', message => {
+            toastr.error(message);
+        });
     });
 </script>
 @endpush

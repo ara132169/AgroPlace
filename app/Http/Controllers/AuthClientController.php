@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Client;
+use App\Mail\ClientRegistrationConfirmation;
 
 class AuthClientController extends Controller
 {
@@ -53,8 +55,16 @@ class AuthClientController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Enviar correo de confirmación de registro
+        try {
+            Mail::to($client->email)->send(new ClientRegistrationConfirmation($client));
+        } catch (\Exception $e) {
+            // Log el error pero no interrumpir el proceso de registro
+            \Log::error('Error enviando correo de confirmación de registro: ' . $e->getMessage());
+        }
+
         Auth::guard('client')->login($client);
 
-        return redirect()->route('cliente.panel');
+        return redirect()->route('cliente.panel')->with('success', '¡Bienvenido! Tu cuenta ha sido creada exitosamente. Revisa tu correo electrónico para más información.');
     }
 }

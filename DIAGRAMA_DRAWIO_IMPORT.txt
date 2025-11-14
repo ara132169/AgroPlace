@@ -1,0 +1,121 @@
+# 🔄 INSTRUCCIONES PARA IMPORTAR A DRAW.IO
+
+## 📋 OPCIÓN 1: Importación directa de Mermaid
+
+### Código del Flujo Principal (copia este bloque):
+```mermaid
+flowchart TD
+    A[Cliente navega productos] --> B{Producto de interés?}
+    B -->|No| A
+    B -->|Sí| C[Ver detalles del producto]
+    C --> D{Agregar al carrito?}
+    D -->|No| A
+    D -->|Sí| E[Añadir al carrito]
+    E --> F[Ver carrito actualizado]
+    F --> G{Seguir comprando?}
+    G -->|Sí| A
+    G -->|No| H[Proceder al checkout]
+    H --> I[Completar datos de envío]
+    I --> J[Seleccionar método de pago]
+    J --> K[Procesar pago con Stripe]
+    K --> L{Pago exitoso?}
+    L -->|No| M[Mostrar error de pago]
+    M --> N{Reintentar?}
+    N -->|Sí| J
+    N -->|No| O[Abandonar compra]
+    L -->|Sí| P[Crear orden en base de datos]
+    P --> Q[Calcular comisiones automáticamente]
+    Q --> R[Enviar email confirmación a cliente]
+    R --> S[Notificar a vendedores]
+    S --> T[Actualizar dashboard cliente]
+    T --> U[Actualizar dashboard vendedores]
+    U --> V[Registrar venta en panel admin]
+    V --> W[Admin ve nueva comisión]
+    W --> X{Procesar depósito?}
+    X -->|No| Y[Mantener pendiente]
+    Y --> Z[Esperar procesamiento manual]
+    Z --> X
+    X -->|Sí| AA[Verificar cuenta de vendedor]
+    AA --> BB{Cuenta verificada?}
+    BB -->|No| CC[Solicitar verificación]
+    CC --> DD[Vendedor actualiza datos]
+    DD --> AA
+    BB -->|Sí| EE[Calcular monto 85%]
+    EE --> FF[Realizar transferencia bancaria]
+    FF --> GG[Actualizar estado a Completado]
+    GG --> HH[Notificar vendedor por email]
+    HH --> II[Proceso completado]
+```
+
+## 📋 OPCIÓN 2: URLs para herramientas online
+
+### 🌐 Herramientas de conversión:
+1. **Mermaid Live Editor**: https://mermaid.live
+2. **Draw.io**: https://app.diagrams.net
+3. **Kroki**: https://kroki.io
+4. **Mermaid to SVG**: https://mermaid.ink
+
+## 📋 OPCIÓN 3: Pasos detallados para Draw.io
+
+### 🎯 Método A - Importación Mermaid:
+1. Abre https://app.diagrams.net
+2. Crea nuevo diagrama
+3. Ve a: Arrange → Insert → Advanced → Mermaid
+4. Pega el código Mermaid del bloque de arriba
+5. Ajusta estilos y colores
+
+### 🎯 Método B - Creación manual:
+1. Usa "Flowchart" shapes de la librería izquierda
+2. Elementos recomendados:
+   - Rectángulos para procesos
+   - Rombos para decisiones
+   - Círculos para inicio/fin
+   - Conectores con etiquetas
+
+### 🎯 Método C - Importar desde SVG:
+1. Usa Mermaid Live para generar SVG
+2. Descarga el archivo SVG
+3. En Draw.io: File → Import from → Device
+4. Selecciona el archivo SVG
+
+## 🎨 CÓDIGO DE COLORES PARA DRAW.IO
+
+### Paleta de colores recomendada:
+- **Cliente**: #E1F5FE (azul claro)
+- **Vendedor**: #E8F5E8 (verde claro)  
+- **Admin**: #FFF3E0 (naranja claro)
+- **Pago**: #FCE4EC (rosa claro)
+- **Decisiones**: #F3E5F5 (morado claro)
+
+## 📝 ELEMENTOS PRINCIPALES
+
+### Actores del sistema:
+1. 👤 **Cliente** - Navega, compra, recibe
+2. 🏪 **Vendedor** - Vende, gestiona, cobra
+3. ⚡ **Admin** - Supervisa, deposita, controla
+
+### Procesos clave:
+1. 🛒 **Navegación y compra**
+2. 💳 **Procesamiento de pago**
+3. 📊 **Cálculo de comisiones**
+4. 🏦 **Gestión de depósitos**
+5. 📧 **Sistema de notificaciones**
+
+### Flujos de decisión:
+1. ¿Producto de interés?
+2. ¿Agregar al carrito?
+3. ¿Pago exitoso?
+4. ¿Cuenta verificada?
+5. ¿Procesar depósito?
+
+---
+
+## 🚀 RECOMENDACIÓN
+
+**La opción más rápida es usar Mermaid Live:**
+1. Copia el código de arriba
+2. Pégalo en https://mermaid.live
+3. Exporta como SVG
+4. Importa el SVG a Draw.io
+
+**Esto te dará un diagrama profesional y editable en Draw.io**

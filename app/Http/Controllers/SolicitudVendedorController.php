@@ -20,7 +20,30 @@ class SolicitudVendedorController extends Controller
         $solicitud->verified = 1;  // Cambiar el campo verified a 1 (verificado)
         $solicitud->save();
 
-        return redirect()->route('admin.home')->with('success', 'Solicitud verificada con éxito');
+        // Enviar correo de aprobación al vendedor
+        try {
+            \Mail::to($solicitud->email)->send(new \App\Mail\SellerAccountApproved($solicitud));
+            
+            // Log del envío exitoso
+            \Log::info('Correo de aprobación enviado al vendedor', [
+                'seller_id' => $solicitud->id,
+                'seller_email' => $solicitud->email,
+                'seller_name' => $solicitud->name,
+                'approved_at' => now()
+            ]);
+            
+            $message = 'Solicitud verificada con éxito y correo de bienvenida enviado.';
+        } catch (\Exception $e) {
+            // Log del error pero no fallar la aprobación
+            \Log::error('Error enviando correo de aprobación al vendedor', [
+                'seller_id' => $solicitud->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            $message = 'Solicitud verificada con éxito. (Nota: hubo un problema enviando el correo de confirmación)';
+        }
+
+        return redirect()->route('admin.home')->with('success', $message);
     }
 
     // Eliminar (rechazar) solicitud

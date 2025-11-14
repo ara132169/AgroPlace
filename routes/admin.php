@@ -66,10 +66,48 @@ Route::prefix('admin')->name('admin.')->group(function(){
                 });
              });
 
-             
+             // Rutas de gestión de depósitos
+             Route::controller(\App\Http\Controllers\Admin\DepositManagementController::class)->group(function(){
+                Route::get('/depositos','index')->name('depositos');
+                Route::get('/depositos/{id}/detalles','getDepositDetails')->name('depositos.detalles');
+                Route::post('/depositos/detalles-cuenta','getAccountDetails')->name('depositos.detallesCuenta');
+                Route::post('/depositos/{id}/actualizar-estado','updateStatus')->name('depositos.actualizar-estado');
+                Route::post('/depositos/procesar-todos-pendientes','processAllPending')->name('depositos.procesar-todos');
+                Route::get('/cuentas-pago/pendientes','pendingAccounts')->name('cuentas-pago.pendientes');
+                Route::post('/cuentas-pago/{id}/verificar','verifyPaymentAccount')->name('cuentas-pago.verificar');
+                Route::get('/depositos/estadisticas','stats')->name('depositos.estadisticas');
+                
+                // Ruta de prueba para debug
+                Route::get('/depositos/test-debug', function() {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'El sistema de rutas funciona correctamente',
+                        'timestamp' => now(),
+                        'rutas_funcionando' => [
+                            'depositos' => route('admin.depositos'),
+                            'detalles' => route('admin.depositos.detalles', 1),
+                            'cuentas' => route('admin.cuentas-vendedores')
+                        ]
+                    ]);
+                })->name('depositos.test-debug');
+                
+                // Ruta de prueba para actualizar estado
+                Route::post('/depositos/test-update/{id}', function($id) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Test de actualización funcionando',
+                        'deposit_id' => $id,
+                        'timestamp' => now(),
+                        'request_data' => request()->all()
+                    ]);
+                })->name('depositos.test-update');
+                
+                // Rutas para gestión de cuentas de vendedores
+                Route::get('/cuentas-vendedores','sellerAccounts')->name('cuentas-vendedores');
+                Route::get('/cuentas-vendedores/{id}','viewSellerAccount')->name('cuentas-vendedores.ver');
+                Route::post('/cuentas-vendedores/{id}/verificar','verifySellerAccount')->name('cuentas-vendedores.verificar');
+             });
 
-
-          
         });
 
 });

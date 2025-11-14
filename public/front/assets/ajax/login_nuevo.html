@@ -1,0 +1,219 @@
+<div class="login-popup">
+    <div class="tab tab-nav-boxed tab-nav-center tab-nav-underline">
+        <ul class="nav nav-tabs text-uppercase" role="tablist">
+            <li class="nav-item">
+                <a href="#sign-in" class="nav-link active">Iniciar Sesión</a>
+            </li>
+            <li class="nav-item">
+                <a href="#sign-up" class="nav-link">Registrarse</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="sign-in">
+                <!-- Mensajes de error -->
+                <div id="login-errors" class="alert alert-danger" style="display: none;"></div>
+                <div id="login-success" class="alert alert-success" style="display: none;"></div>
+                
+                <form id="login-form" action="/cliente/login-handler" method="POST">
+                    <input type="hidden" name="_token" value="">
+                    <div class="form-group">
+                        <label>Correo o nombre de usuario *</label>
+                        <input type="text" class="form-control" name="login_id" id="login_id" required>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Contraseña *</label>
+                        <input type="password" class="form-control" name="password" id="password" required>
+                    </div>
+                    <div class="form-checkbox d-flex align-items-center justify-content-between">
+                        <input type="checkbox" class="custom-checkbox" id="remember" name="remember">
+                        <label for="remember">Recordarme</label>
+                        <a href="/cliente/password/reset">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </form>
+            </div>
+            <div class="tab-pane" id="sign-up">
+                <!-- Mensajes de error para registro -->
+                <div id="register-errors" class="alert alert-danger" style="display: none;"></div>
+                <div id="register-success" class="alert alert-success" style="display: none;"></div>
+                
+                <form id="register-form" action="/cliente/registro" method="POST">
+                    <input type="hidden" name="_token" value="">
+                    <div class="form-group">
+                        <label>Nombre completo *</label>
+                        <input type="text" class="form-control" name="name" id="register_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre de usuario *</label>
+                        <input type="text" class="form-control" name="username" id="register_username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo electrónico *</label>
+                        <input type="email" class="form-control" name="email" id="register_email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña *</label>
+                        <input type="password" class="form-control" name="password" id="register_password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar contraseña *</label>
+                        <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" required>
+                    </div>
+                    <div class="form-checkbox d-flex align-items-center justify-content-between mb-5">
+                        <input type="checkbox" class="custom-checkbox" id="agree" name="agree" required>
+                        <label for="agree" class="font-size-md">Acepto los <a href="#" class="text-primary font-size-md">términos y condiciones</a></label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                </form>
+            </div>
+        </div>
+        <p class="text-center mt-3">Iniciar sesión con redes sociales</p>
+        <div class="social-icons social-icon-border-color d-flex justify-content-center">
+            <a href="#" class="social-icon social-facebook w-icon-facebook"></a>
+            <a href="#" class="social-icon social-twitter w-icon-twitter"></a>
+            <a href="#" class="social-icon social-google fab fa-google"></a>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Obtener CSRF token dinámicamente
+    const csrfToken = $('meta[name="csrf-token"]').attr('content') || 
+                     $('input[name="_token"]').first().val() ||
+                     document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
+    // Establecer token en formularios
+    $('input[name="_token"]').val(csrfToken);
+    
+    // AJAX Login
+    $('#login-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const formData = form.serialize();
+        
+        // Limpiar mensajes anteriores
+        $('#login-errors, #login-success').hide().empty();
+        
+        // Mostrar loading
+        const submitBtn = form.find('button[type="submit"]');
+        const originalText = submitBtn.text();
+        submitBtn.text('Iniciando sesión...').prop('disabled', true);
+        
+        // Debug
+        console.log('Enviando petición AJAX...', formData);
+        
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            success: function(response) {
+                console.log('Success response:', response);
+                if (response.success) {
+                    $('#login-success').text(response.message).show();
+                    setTimeout(function() {
+                        window.location.href = response.redirect || '/cliente/panel';
+                    }, 1000);
+                } else {
+                    $('#login-errors').html('<ul><li>' + response.message + '</li></ul>').show();
+                }
+            },
+            error: function(xhr) {
+                console.log('Error response:', xhr);
+                console.log('Status:', xhr.status);
+                console.log('Response text:', xhr.responseText);
+                
+                if (xhr.status === 422) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        let errorHtml = '<ul>';
+                        for (let field in errors) {
+                            errors[field].forEach(function(error) {
+                                errorHtml += '<li>' + error + '</li>';
+                            });
+                        }
+                        errorHtml += '</ul>';
+                        $('#login-errors').html(errorHtml).show();
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        $('#login-errors').html('<ul><li>' + xhr.responseJSON.message + '</li></ul>').show();
+                    } else {
+                        $('#login-errors').html('<ul><li>Credenciales inválidas</li></ul>').show();
+                    }
+                } else if (xhr.status === 302) {
+                    window.location.href = '/cliente/panel';
+                } else {
+                    $('#login-errors').html('<ul><li>Error del servidor (Status: ' + xhr.status + '). Intenta de nuevo.</li></ul>').show();
+                }
+            },
+            complete: function() {
+                submitBtn.text(originalText).prop('disabled', false);
+            }
+        });
+    });
+    
+    // AJAX Register
+    $('#register-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const formData = form.serialize();
+        
+        $('#register-errors, #register-success').hide().empty();
+        
+        const submitBtn = form.find('button[type="submit"]');
+        const originalText = submitBtn.text();
+        submitBtn.text('Registrando...').prop('disabled', true);
+        
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#register-success').text(response.message).show();
+                    setTimeout(function() {
+                        window.location.href = response.redirect || '/cliente/panel';
+                    }, 1000);
+                } else {
+                    $('#register-errors').html('<ul><li>' + response.message + '</li></ul>').show();
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        let errorHtml = '<ul>';
+                        for (let field in errors) {
+                            errors[field].forEach(function(error) {
+                                errorHtml += '<li>' + error + '</li>';
+                            });
+                        }
+                        errorHtml += '</ul>';
+                        $('#register-errors').html(errorHtml).show();
+                    } else {
+                        $('#register-errors').html('<ul><li>Error en el registro</li></ul>').show();
+                    }
+                } else {
+                    $('#register-errors').html('<ul><li>Error del servidor. Intenta de nuevo.</li></ul>').show();
+                }
+            },
+            complete: function() {
+                submitBtn.text(originalText).prop('disabled', false);
+            }
+        });
+    });
+});
+</script>

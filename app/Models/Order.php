@@ -28,6 +28,9 @@ class Order extends Model
         'stripe_payment_intent_id',
         'stripe_payment_status',
         'payment_currency',
+        // Campos de comisiones
+        'platform_fee',
+        'seller_amount',
     ];
 
     public function client()
@@ -40,12 +43,23 @@ class Order extends Model
         return $this->belongsTo(Seller::class);
     }
 
+    // Comprador: puede ser cliente o vendedor
+    public function buyerClient()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function buyerSeller()
+    {
+        return $this->belongsTo(Seller::class, 'seller_id');
+    }
+
     public function buyer()
     {
         if ($this->buyer_type === 'client') {
-            return $this->client();
+            return $this->buyerClient();
         } else {
-            return $this->seller();
+            return $this->buyerSeller();
         }
     }
 

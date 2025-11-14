@@ -455,6 +455,13 @@
 							</a>
 						</li>
 
+						<li>
+							<a href="{{ route('admin.depositos') }}" class="dropdown-toggle no-arrow {{ Route::is('admin.depositos*') || Route::is('admin.cuentas-pago*') || Route::is('admin.cuentas-vendedores*') ? 'active' : '' }}">
+								<span class="micon bi bi-credit-card"></span
+								><span class="mtext">💰 Gestión Depósitos</span>
+							</a>
+						</li>
+
 					
 						<li>
 							<div class="dropdown-divider"></div>
@@ -520,6 +527,26 @@
 							<ul class="submenu">
 								<li><a href="{{ route('tienda.product.productos') }}" class="{{ Route::is('tienda.product.productos') ? 'active' : '' }}">Todos los productos</a></li>
 								<li><a href="{{ route('tienda.product.agregar-productos') }}" class="{{ Route::is('tienda.product.agregar-productos') ? 'active' : '' }}">Añadir nuevo producto</a></li>
+							</ul>
+						</li>
+
+						<li class="dropdown">
+							<a href="javascript:;" class="dropdown-toggle {{ Route::is('tienda.stripe.*') || Route::is('tienda.payment.*') || Route::is('tienda.deposit.*') ? 'active' : '' }}">
+								<span class="micon bi bi-credit-card"></span>
+								<span class="mtext">� Gestión de Pagos
+									@auth('seller')
+										@if(auth('seller')->user()->hasPaymentAccount())
+											<span class="badge badge-success badge-pill ml-1" style="font-size: 10px;">✓</span>
+										@else
+											<span class="badge badge-warning badge-pill ml-1" style="font-size: 10px;">!</span>
+										@endif
+									@endauth
+								</span>
+							</a>
+							<ul class="submenu">
+								<li><a href="{{ route('tienda.stripe.config') }}" class="{{ Route::is('tienda.stripe.*') ? 'active' : '' }}">🎯 Stripe Connect</a></li>
+								<li><a href="{{ route('tienda.payment.accounts') }}" class="{{ Route::is('tienda.payment.*') ? 'active' : '' }}">💳 Mis Cuentas</a></li>
+								<li><a href="{{ route('tienda.deposit.history') }}" class="{{ Route::is('tienda.deposit.*') ? 'active' : '' }}">📊 Historial Depósitos</a></li>
 							</ul>
 						</li>
 

@@ -37,7 +37,7 @@ class ClientResetPasswordController extends Controller
 
         if ($status === Password::PASSWORD_RESET) {
             Session::flash('success', 'Tu contraseña ha sido actualizada correctamente.');
-            return redirect()->route('client.login'); // Asegúrate de tener esta ruta
+            return redirect()->route('cliente.ingresar');
         }
 
         return back()->withErrors(['email' => __($status)]);

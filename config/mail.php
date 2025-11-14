@@ -108,9 +108,21 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'noreply@agroplace.com'),
+        'name' => env('MAIL_FROM_NAME', 'AgroPlace'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Email Address
+    |--------------------------------------------------------------------------
+    |
+    | This is the email address where administrative notifications will be sent,
+    | such as new seller registrations, important system alerts, etc.
+    |
+    */
+
+    'admin_email' => env('MAIL_ADMIN_ADDRESS', 'admin@agroplace.com'),
 
     /*
     |--------------------------------------------------------------------------

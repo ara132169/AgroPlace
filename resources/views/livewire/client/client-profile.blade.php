@@ -3,9 +3,9 @@
 						<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mb-30">
 							<div class="pd-20 card-box height-100-p">
 								<div class="profile-photo">
-									<a href="javascript:;" onclick="event.preventDefault();document.getElementById('clientProfilePictureFile').click();" class="edit-avatar"><i class="fa fa-pencil"></i></a>
-									<img src="{{$client->picture}}" alt="" class="avatar-photo" id="clientProfilePicture">
-                                    <input type="file" name="clientProfilePictureFile" id="clientProfilePictureFile" class="d-none" style="opacity: 0">
+									<a href="javascript:;" onclick="event.preventDefault();document.getElementById('clientProfilePicture').click();" class="edit-avatar"><i class="fa fa-pencil"></i></a>
+									<img src="{{$client->picture ?: '/back/vendors/images/avatar.png'}}" alt="" class="avatar-photo" id="clientProfilePicturePreview">
+                                    <input type="file" name="clientProfilePicture" id="clientProfilePicture" class="d-none" accept="image/*" wire:model="profilePicture">
 
 								</div>
 								<h5 class="text-center h5 mb-0">{{$client->name}}</h5>

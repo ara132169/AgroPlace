@@ -18,14 +18,19 @@ use Stripe\Exception\InvalidRequestException;
 use Stripe\Exception\AuthenticationException;
 use Stripe\Exception\ApiConnectionException;
 use Stripe\Exception\ApiErrorException;
+use App\Services\StripeConnectService;
+use App\Models\Seller;
+use App\Models\Product;
 
 class CheckoutController extends Controller
 {
     protected $stripeService;
+    protected $stripeConnectService;
 
-    public function __construct(StripeService $stripeService)
+    public function __construct(StripeService $stripeService, StripeConnectService $stripeConnectService)
     {
         $this->stripeService = $stripeService;
+        $this->stripeConnectService = $stripeConnectService;
     }
 
     public function index()
@@ -243,26 +248,28 @@ class CheckoutController extends Controller
             $totalAmount = collect($cartItems)->sum(fn($item) => $item['price'] * $item['quantity']);
             $amountInCents = (int) ($totalAmount * 100);
 
-            // Determinar el tipo de usuario y obtener el ID
+            // Determinar el client_id (siempre necesario para orders)
             $clientId = null;
-            $sellerId = null;
-            $buyerType = 'client';
 
             if (Auth::guard('client')->check()) {
                 $clientId = Auth::guard('client')->id();
-                $buyerType = 'client';
             } elseif (Auth::guard('seller')->check()) {
-                $sellerId = Auth::guard('seller')->id();
-                $buyerType = 'seller';
+                // Si es un vendedor comprando, buscar client asociado por email
+                $seller = Auth::guard('seller')->user();
+                $client = \App\Models\Client::where('email', $seller->email)->first();
+                
+                if (!$client) {
+                    throw new \Exception('Vendedor debe tener una cuenta de cliente asociada para realizar compras');
+                }
+                
+                $clientId = $client->id;
             } else {
                 throw new \Exception('Usuario no autenticado');
             }
 
             // Create the order first
             $order = Order::create([
-                'client_id' => $clientId,
-                'seller_id' => $sellerId,
-                'buyer_type' => $buyerType,
+                'client_id' => $clientId, // Solo usar client_id, no seller_id ni buyer_type
                 'shipping_name' => $request->shipping_name . ' ' . $request->surname,
                 'shipping_address' => $request->address,
                 'shipping_company' => $request->company ?? '', // Usar string vacío si no se proporciona
@@ -289,39 +296,94 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            // Log debug information
-            Log::info('Creating payment intent with data:', [
+            // 🆕 OBTENER VENDEDORES DE LOS PRODUCTOS PARA SISTEMA DE COMISIONES
+            $productIds = collect($cartItems)->pluck('product_id')->unique();
+            $products = Product::with('seller')->whereIn('id', $productIds)->get();
+            $sellers = $products->pluck('seller')->unique('id');
+
+            Log::info('🛒 Análisis de vendedores en carrito', [
+                'product_ids' => $productIds->toArray(),
+                'sellers_count' => $sellers->count(),
+                'sellers' => $sellers->pluck('id', 'name')->toArray()
+            ]);
+
+            // Verificar que todos los vendedores tengan Stripe Connect configurado
+            $sellersWithoutStripe = $sellers->filter(function($seller) {
+                return !$seller->isStripeAccountActive();
+            });
+
+            if ($sellersWithoutStripe->isNotEmpty()) {
+                Log::warning('❌ Vendedores sin Stripe Connect activo', [
+                    'sellers_without_stripe' => $sellersWithoutStripe->pluck('id', 'name')->toArray()
+                ]);
+                
+                throw new \Exception('Algunos vendedores no tienen configurada su cuenta de pagos. No se puede procesar la compra.');
+            }
+
+            // Log debug information con sistema de comisiones
+            Log::info('Creating payment intent with commission split:', [
                 'amount' => $amountInCents,
                 'payment_method_id' => $request->payment_method_id,
                 'order_id' => $order->id,
+                'sellers_count' => $sellers->count(),
+                'commission_rate' => '15%'
             ]);
 
-            // Create payment intent with Stripe
-            $paymentIntent = $this->stripeService->createPaymentIntent([
-                'amount' => $amountInCents, // Ya está en centavos
-                'currency' => 'mxn',
-                'payment_method' => $request->payment_method_id,
-                'confirmation_method' => 'manual',
-                'confirm' => true,
-                'return_url' => url('/checkout-test'), // URL de retorno requerida
-                'metadata' => [
-                    'order_id' => $order->id,
-                    'client_email' => $request->email,
-                ],
-            ]);
+            // 💰 CREAR PAGO CON DIVISIÓN AUTOMÁTICA DE COMISIONES
+            // Detectar automáticamente si Connect está disponible
+            if ($request->is('checkout-test*') || !$this->isStripeConnectAvailable()) {
+                Log::info('🧪 MODO FALLBACK: Pago directo con comisiones calculadas localmente');
+                
+                // Crear pago directo (sin Connect) y calcular comisiones localmente
+                $paymentResult = $this->createDirectPaymentWithCommission(
+                    $amountInCents,
+                    $request->payment_method_id,
+                    $sellers,
+                    $order->id
+                );
+                
+                Log::info('✅ Pago directo creado con comisiones calculadas localmente');
+            } else {
+                // Pago real con Stripe Connect (solo si está disponible)
+                Log::info('🔄 MODO CONNECT: Usando Stripe Connect para división automática');
+                $paymentResult = $this->stripeConnectService->createPaymentWithSplit(
+                    $amountInCents,
+                    $request->payment_method_id,
+                    [
+                        'order_id' => $order->id,
+                        'client_email' => $request->email,
+                    ],
+                    $sellers
+                );
+            }
 
-            Log::info('Payment intent created successfully:', [
+            $paymentIntent = $paymentResult['payment_intent'];
+
+            Log::info('💰 Payment intent with commission created successfully:', [
                 'payment_intent_id' => $paymentIntent->id,
                 'status' => $paymentIntent->status,
+                'platform_fee' => $paymentResult['platform_fee'],
+                'seller_amount' => $paymentResult['seller_amount'],
+                'seller_id' => $paymentResult['seller_id']
             ]);
 
-            // Update order with payment intent ID
+            // Update order with payment intent ID and commission info
             $order->update([
                 'stripe_payment_intent_id' => $paymentIntent->id,
+                'platform_fee' => $paymentResult['platform_fee'] / 100, // Convertir a pesos
+                'seller_amount' => $paymentResult['seller_amount'] / 100, // Convertir a pesos
             ]);
 
             // Handle the payment result
             if ($paymentIntent->status === 'succeeded') {
+                Log::info('✅ Pago exitoso con comisiones distribuidas', [
+                    'order_id' => $order->id,
+                    'total_paid' => $amountInCents / 100,
+                    'platform_commission' => ($paymentResult['platform_fee'] / 100),
+                    'seller_receives' => ($paymentResult['seller_amount'] / 100),
+                    'commission_rate' => '15%'
+                ]);
+
                 $order->update([
                     'stripe_payment_status' => 'succeeded',
                     'status' => 'confirmed',
@@ -363,6 +425,14 @@ class CheckoutController extends Controller
                 ]);
             } else {
                 // Payment failed
+                Log::error('❌ Pago con comisiones falló', [
+                    'payment_status' => $paymentIntent->status,
+                    'order_id' => $order->id,
+                    'attempted_amount' => $amountInCents / 100,
+                    'platform_fee' => $paymentResult['platform_fee'] / 100,
+                    'seller_amount' => $paymentResult['seller_amount'] / 100
+                ]);
+                
                 $order->update([
                     'stripe_payment_status' => 'failed',
                     'status' => 'cancelled',
@@ -386,10 +456,12 @@ class CheckoutController extends Controller
             $error = $e->getError();
             $errorMessage = $this->getStripeErrorMessage($error->code, $error->message);
             
-            Log::warning('Stripe Card Exception: ' . $e->getMessage(), [
+            Log::warning('💳 Stripe Card Exception durante pago con comisiones: ' . $e->getMessage(), [
                 'error_code' => $error->code,
                 'error_type' => $error->type,
                 'decline_code' => $error->decline_code ?? null,
+                'order_id' => $order->id ?? 'unknown',
+                'attempted_amount' => isset($amountInCents) ? $amountInCents / 100 : 'unknown'
             ]);
             
             if ($request->ajax() || $request->wantsJson()) {
@@ -684,6 +756,91 @@ class CheckoutController extends Controller
         } catch (\Exception $e) {
             Log::error('Error generando PDF de orden: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al generar el PDF de la orden.');
+        }
+    }
+
+    /**
+     * Verificar si Stripe Connect está disponible
+     */
+    private function isStripeConnectAvailable()
+    {
+        try {
+            Log::info('🔍 Verificando Stripe Connect...');
+            
+            // Verificar si hay vendedores con cuentas Connect configuradas
+            $sellersWithConnect = \App\Models\Seller::where('stripe_account_id', '!=', null)
+                                                  ->where('stripe_account_status', 'active')
+                                                  ->where('stripe_charges_enabled', true)
+                                                  ->count();
+            
+            if ($sellersWithConnect > 0) {
+                Log::info("✅ CONNECT DISPONIBLE: {$sellersWithConnect} vendedores configurados");
+                Log::info('� Verificando compatibilidad geográfica...');
+                
+                // Por ahora, debido a restricciones MX->MX, mantenemos modo directo
+                // Pero dejamos la base para cuando se configure con cuentas internacionales
+                Log::info('⚠️ RESTRICCIÓN MÉXICO: Connect MX->MX no soportado por Stripe');
+                Log::info('💡 Para activar: vendedores deben configurar cuentas internacionales (US/EU)');
+                Log::info('📋 Usando sistema híbrido: comisiones manuales por ahora');
+                
+                return false; // ❌ FORZAMOS MODO DIRECTO para usar sistema de depósitos manuales
+            } else {
+                Log::info('❌ No hay vendedores con Stripe Connect configurado');
+                Log::info('📋 Usando sistema de pago directo + comisiones manuales (15%)');
+                return false;
+            }
+            
+        } catch (\Exception $e) {
+            Log::warning("Error verificando Connect: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Crear pago directo sin Connect, calculando comisiones localmente
+     */
+    private function createDirectPaymentWithCommission($amountInCents, $paymentMethodId, $sellers, $orderId)
+    {
+        try {
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+            
+            // Crear pago simple (como el sistema original)
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => $amountInCents,
+                'currency' => 'mxn',
+                'payment_method' => $paymentMethodId,
+                'confirm' => true,
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                    'allow_redirects' => 'never' // Evitar métodos que requieren redirect
+                ],
+                'metadata' => [
+                    'order_id' => $orderId,
+                    'commission_calculated_locally' => 'true'
+                ]
+            ]);
+            
+            // Calcular comisiones localmente (15%)
+            $platformFee = $amountInCents * 0.15;
+            $sellerAmount = $amountInCents - $platformFee;
+            
+            Log::info('💰 Pago directo exitoso con comisión calculada:', [
+                'payment_intent_id' => $paymentIntent->id,
+                'total_amount' => $amountInCents / 100,
+                'platform_fee' => $platformFee / 100,
+                'seller_amount' => $sellerAmount / 100
+            ]);
+            
+            return [
+                'payment_intent' => $paymentIntent,
+                'platform_fee' => $platformFee,
+                'seller_amount' => $sellerAmount,
+                'seller_id' => $sellers->first()->id ?? 1
+            ];
+            
+        } catch (\Exception $e) {
+            Log::error("Error en pago directo: " . $e->getMessage());
+            throw $e;
         }
     }
 

@@ -81,42 +81,322 @@
         font-size: 0.9rem;
     }
 
+    /* Estilos para estadísticas de comisiones */
+    .commission-stats {
+        background: var(--bg-light);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-light);
+    }
+
+    .commission-header {
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .commission-header h4 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .commission-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .commission-card {
+        background: var(--bg-white);
+        padding: 1.25rem;
+        border-radius: var(--border-radius);
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-light);
+    }
+
+    .commission-card.earned {
+        border-left: 4px solid var(--success-color);
+    }
+
+    .commission-card.pending {
+        border-left: 4px solid var(--warning-color);
+    }
+
+    .commission-card.total {
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .commission-card.percentage {
+        border-left: 4px solid #6f42c1;
+    }
+
+    .commission-card h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .commission-card.earned h3 {
+        color: var(--success-color);
+    }
+
+    .commission-card.pending h3 {
+        color: var(--warning-color);
+    }
+
+    .commission-card.total h3 {
+        color: var(--primary-color);
+    }
+
+    .commission-card.percentage h3 {
+        color: #6f42c1;
+    }
+
+    .commission-card p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
     .sales-table {
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 2rem;
         font-family: var(--font-family);
+        font-size: 0.85rem;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .sales-table thead th {
-        background: var(--bg-light);
-        color: var(--text-primary);
-        padding: 1rem 0.75rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 0.5rem;
         font-weight: 600;
         text-align: left;
-        border-bottom: 1px solid var(--border-light);
-        font-size: 0.9rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .sales-table tbody tr {
-        border-bottom: 1px solid var(--border-light);
-        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #f1f3f4;
+        transition: all 0.2s ease;
     }
 
     .sales-table tbody tr:hover {
-        background-color: var(--bg-light);
+        background-color: #f8f9ff;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .sales-table tbody td {
-        padding: 1rem 0.75rem;
+        padding: 0.6rem 0.5rem;
         vertical-align: middle;
         color: var(--text-primary);
     }
 
+    /* Estilos compactos para columnas específicas */
+    .sales-table .col-id {
+        width: 80px;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .sales-table .col-date {
+        width: 90px;
+        font-size: 0.8rem;
+    }
+
+    .sales-table .col-buyer {
+        width: 160px;
+    }
+
+    .sales-table .col-type {
+        width: 80px;
+        text-align: center;
+    }
+
+    .sales-table .col-sellers {
+        width: 150px;
+    }
+
+    .sales-table .col-items {
+        width: 70px;
+        text-align: center;
+    }
+
+    .sales-table .col-status {
+        width: 100px;
+        text-align: center;
+    }
+
+    .sales-table .col-total {
+        width: 90px;
+        text-align: right;
+        font-weight: 600;
+    }
+
+    .sales-table .col-seller-amount {
+        width: 100px;
+        text-align: right;
+    }
+
+    .sales-table .col-commission {
+        width: 100px;
+        text-align: right;
+    }
+
+    .sales-table .col-actions {
+        width: 80px;
+        text-align: center;
+    }
+
     .order-status {
         display: inline-block;
-        padding: 4px 12px;
-        border-radius: 4px;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    .status-processing {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .status-completed {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Badges compactos */
+    .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .badge-primary {
+        background: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+    }
+
+    .badge-success {
+        background: #e8f5e8;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+
+    .badge-info {
+        background: #e1f5fe;
+        color: #0277bd;
+        border: 1px solid #b3e5fc;
+    }
+
+    /* Seller tags más pequeños */
+    .seller-tag {
+        display: inline-block;
+        background: #f1f3f4;
+        color: #5f6368;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        margin-right: 4px;
+        margin-bottom: 2px;
+        font-weight: 500;
+    }
+
+    /* Botón de acción más compacto */
+    .btn-view {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+        display: inline-block;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Montos y comisiones */
+    .amount-success {
+        color: #2e7d32;
+        font-weight: 600;
+    }
+
+    .amount-warning {
+        color: #f57c00;
+        font-weight: 600;
+    }
+
+    .amount-primary {
+        color: #1976d2;
+        font-weight: 600;
+    }
+
+    .amount-small {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        display: block;
+        margin-top: 2px;
+    }
+
+    /* Información del comprador más compacta */
+    .buyer-info {
+        line-height: 1.2;
+    }
+
+    .buyer-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.8rem;
+    }
+
+    .buyer-email {
+        color: #6c757d;
+        font-size: 0.7rem;
+        margin-top: 2px;
+    }
         font-size: 0.8rem;
         font-weight: 500;
         text-transform: capitalize;
@@ -226,6 +506,34 @@
         color: var(--text-secondary);
         margin-bottom: 2rem;
         font-family: var(--font-family);
+    }
+
+    /* Estilos para columnas de comisiones */
+    .commission-cell {
+        text-align: center;
+        font-size: 0.9rem;
+    }
+    
+    .commission-earned {
+        color: var(--success-color);
+        font-weight: 600;
+    }
+    
+    .commission-pending {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    .seller-payment {
+        text-align: center;
+    }
+    
+    .payment-completed {
+        color: var(--success-color);
+    }
+    
+    .payment-pending {
+        color: var(--warning-color);
     }
 
     /* Responsive */
@@ -440,6 +748,45 @@
         </div>
     </div>
 
+    <!-- Estadísticas de comisiones -->
+    <div class="commission-stats">
+        <div class="commission-header">
+            <h4><i class="fa fa-chart-pie text-success"></i> Resumen de Comisiones (15%)</h4>
+        </div>
+        <div class="commission-grid">
+            <div class="commission-card earned">
+                @php
+                    $comisionesCobradas = $ventas->whereNotNull('platform_fee')->sum('platform_fee');
+                @endphp
+                <h3>${{ number_format($comisionesCobradas, 2) }}</h3>
+                <p>✅ Comisiones Cobradas</p>
+            </div>
+            <div class="commission-card pending">
+                @php
+                    $comisionesPendientes = $ventas->whereNull('platform_fee')->sum(function($venta) {
+                        return $venta->total * 0.15;
+                    });
+                @endphp
+                <h3>${{ number_format($comisionesPendientes, 2) }}</h3>
+                <p>⏳ Comisiones Pendientes</p>
+            </div>
+            <div class="commission-card total">
+                @php
+                    $comisionesTotal = $comisionesCobradas + $comisionesPendientes;
+                @endphp
+                <h3>${{ number_format($comisionesTotal, 2) }}</h3>
+                <p>💰 Total Comisiones</p>
+            </div>
+            <div class="commission-card percentage">
+                @php
+                    $porcentajeCobrado = $comisionesTotal > 0 ? ($comisionesCobradas / $comisionesTotal * 100) : 0;
+                @endphp
+                <h3>{{ number_format($porcentajeCobrado, 1) }}%</h3>
+                <p>📊 Porcentaje Cobrado</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Formulario de búsqueda y filtros -->
     <div class="search-filters-container">
         <div class="search-filters-header">
@@ -612,56 +959,61 @@
     </div>
 
     @if($ventas && $ventas->count() > 0)
-        <!-- Tabla simple y limpia -->
+        <!-- Tabla optimizada y compacta -->
         <table class="sales-table">
             <thead>
                 <tr>
-                    <th>Pedido</th>
-                    <th>Fecha</th>
-                    <th>Comprador</th>
-                    <th>Tipo</th>
-                    <th>Vendedores</th>
-                    <th>Productos</th>
-                    <th>Estado</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
+                    <th class="col-id">ID</th>
+                    <th class="col-date">Fecha</th>
+                    <th class="col-buyer">Comprador</th>
+                    <th class="col-type">Tipo</th>
+                    <th class="col-sellers">Vendedores</th>
+                    <th class="col-items">Items</th>
+                    <th class="col-status">Estado</th>
+                    <th class="col-total">Total</th>
+                    <th class="col-seller-amount">Al Vendedor</th>
+                    <th class="col-commission">Comisión</th>
+                    <th class="col-actions">Ver</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($ventas as $venta)
                 <tr>
-                    <td data-label="Pedido">
-                        <strong>#{{ $venta->id }}</strong>
+                    <td class="col-id" data-label="ID">
+                        #{{ $venta->id }}
                     </td>
-                    <td data-label="Fecha">
-                        {{ \Carbon\Carbon::parse($venta->created_at)->format('j M Y') }}
+                    <td class="col-date" data-label="Fecha">
+                        {{ \Carbon\Carbon::parse($venta->created_at)->format('j M') }}
                     </td>
-                    <td data-label="Comprador">
-                        <div>
-                            <strong>{{ $venta->client_name }}</strong><br>
-                            <small class="text-muted">{{ $venta->client_email }}</small>
+                    <td class="col-buyer" data-label="Comprador">
+                        <div class="buyer-info">
+                            <div class="buyer-name">{{ Str::limit($venta->client_name, 20) }}</div>
+                            <div class="buyer-email">{{ Str::limit($venta->client_email, 25) }}</div>
                         </div>
                     </td>
-                    <td data-label="Tipo">
+                    <td class="col-type" data-label="Tipo">
                         <span class="badge badge-{{ $venta->buyer_type === 'client' ? 'primary' : 'success' }}">
-                            {{ $venta->buyer_type === 'client' ? 'Cliente' : 'Vendedor' }}
+                            {{ $venta->buyer_type === 'client' ? 'Cliente' : 'Vendor' }}
                         </span>
                     </td>
-                    <td data-label="Vendedores">
+                    <td class="col-sellers" data-label="Vendedores">
                         <div class="seller-tags">
                             @if($venta->vendedores)
-                                @foreach(explode(',', $venta->vendedores) as $vendedor)
-                                    <span class="seller-tag">{{ trim($vendedor) }}</span>
+                                @foreach(array_slice(explode(',', $venta->vendedores), 0, 2) as $vendedor)
+                                    <span class="seller-tag">{{ Str::limit(trim($vendedor), 12) }}</span>
                                 @endforeach
+                                @if(count(explode(',', $venta->vendedores)) > 2)
+                                    <span class="seller-tag">+{{ count(explode(',', $venta->vendedores)) - 2 }}</span>
+                                @endif
                             @else
-                                <span class="text-muted">No especificado</span>
+                                <span class="text-muted" style="font-size: 0.7rem;">N/A</span>
                             @endif
                         </div>
                     </td>
-                    <td data-label="Productos">
-                        <span class="badge badge-info">{{ $venta->items_count }} producto{{ $venta->items_count > 1 ? 's' : '' }}</span>
+                    <td class="col-items" data-label="Items">
+                        <span class="badge badge-info">{{ $venta->items_count }}</span>
                     </td>
-                    <td data-label="Estado">
+                    <td class="col-status" data-label="Estado">
                         <span class="order-status 
                             @if($venta->status === 'pendiente') status-pending
                             @elseif($venta->status === 'pagado') status-processing  
@@ -670,24 +1022,42 @@
                             @else status-cancelled
                             @endif">
                             @if($venta->status === 'pendiente')
-                                Pendiente
+                                Pend
                             @elseif($venta->status === 'pagado')
-                                Pagado
+                                Pago
                             @elseif($venta->status === 'enviado')
-                                Enviado
+                                Env
                             @elseif($venta->status === 'completado')
-                                Completado
+                                Ok
                             @else
-                                Cancelado
+                                X
                             @endif
                         </span>
                     </td>
-                    <td data-label="Total">
-                        <strong>${{ number_format($venta->total, 2) }}</strong>
+                    <td class="col-total" data-label="Total">
+                        ${{ number_format($venta->total, 0) }}
                     </td>
-                    <td data-label="Acciones">
+                    <td class="col-seller-amount" data-label="Al Vendedor">
+                        @if($venta->seller_amount)
+                            <span class="amount-success">${{ number_format($venta->seller_amount, 0) }}</span>
+                            <small class="amount-small">✓ 85%</small>
+                        @else
+                            <span class="amount-warning">${{ number_format($venta->total * 0.85, 0) }}</span>
+                            <small class="amount-small">⏳ 85%</small>
+                        @endif
+                    </td>
+                    <td class="col-commission" data-label="Comisión">
+                        @if($venta->platform_fee)
+                            <span class="amount-success">${{ number_format($venta->platform_fee, 0) }}</span>
+                            <small class="amount-small">✓ 15%</small>
+                        @else
+                            <span class="amount-primary">${{ number_format($venta->total * 0.15, 0) }}</span>
+                            <small class="amount-small">⏳ 15%</small>
+                        @endif
+                    </td>
+                    <td class="col-actions" data-label="Ver">
                         <a href="{{ route('admin.venta.detalle', $venta->id) }}" class="btn-view">
-                            VER DETALLE
+                            Ver
                         </a>
                     </td>
                 </tr>
@@ -700,14 +1070,279 @@
             {{ $ventas->links() }}
         </div>
     @else
-        <!-- Estado vacío simple -->
+        <!-- Estado vacío mejorado -->
         <div class="empty-sales">
-            <i class="fa fa-chart-bar"></i>
-            <h3>¡No hay ventas registradas!</h3>
-            <p>Aún no se han realizado ventas en la plataforma.</p>
+            <div style="text-align: center; padding: 3rem 1rem; color: #6c757d;">
+                <i class="fa fa-chart-bar" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                <h4 style="margin-bottom: 0.5rem; color: #495057;">No hay ventas que mostrar</h4>
+                <p style="margin: 0; font-size: 0.9rem;">Intenta ajustar los filtros o espera a que se realicen nuevas ventas.</p>
+            </div>
         </div>
     @endif
+
+    <!-- Paginación mejorada -->
+    @if($ventas && $ventas->hasPages())
+        <div style="display: flex; justify-content: center; margin-top: 2rem;">
+            <div class="custom-pagination">
+                {{ $ventas->appends(request()->query())->links() }}
+            </div>
+        </div>
+    @endif
+
 </div>
+
+<!-- CSS adicional para controlar iconos de paginación -->
+<style>
+    /* Sobrescribir estilos de paginación de Laravel */
+    .custom-pagination nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .custom-pagination .flex {
+        justify-content: center !important;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .custom-pagination .flex-1 {
+        display: none; /* Ocultar texto "Showing 1 to 15..." */
+    }
+
+    .custom-pagination nav div:first-child p {
+        display: none; /* Ocultar texto de resultados */
+    }
+
+    /* Estilos específicos para los enlaces de paginación */
+    .custom-pagination a,
+    .custom-pagination span {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px !important;
+        margin: 0 2px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background-color: white;
+        color: #6c757d !important;
+        text-decoration: none;
+        font-size: 0.8rem !important;
+        min-width: 35px;
+        height: 35px;
+        transition: all 0.2s ease;
+    }
+
+    .custom-pagination a:hover {
+        background-color: #f8f9fa !important;
+        border-color: #adb5bd !important;
+        color: #495057 !important;
+        transform: translateY(-1px);
+    }
+
+    .custom-pagination .bg-blue-600,
+    .custom-pagination .bg-indigo-600,
+    .custom-pagination [aria-current="page"] {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: white !important;
+    }
+
+    .custom-pagination .text-gray-500 {
+        background-color: #f8f9fa !important;
+        color: #adb5bd !important;
+        cursor: not-allowed;
+    }
+
+    /* Controlar iconos SVG específicamente */
+    .custom-pagination svg {
+        width: 14px !important;
+        height: 14px !important;
+        fill: currentColor;
+    }
+
+    /* Ocultar texto "Previous" y "Next" si existe */
+    .custom-pagination .hidden {
+        display: none !important;
+    }
+
+    /* Centrar completamente la navegación */
+    .custom-pagination nav > div {
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .custom-pagination .sm\\:flex-1 {
+        display: none !important;
+    }
+
+    .custom-pagination .sm\\:flex {
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    /* Forzar tamaño pequeño de iconos SVG */
+    .custom-pagination svg,
+    nav[aria-label="Pagination Navigation"] svg {
+        width: 12px !important;
+        height: 12px !important;
+        fill: currentColor !important;
+    }
+
+    /* Estilo adicional para asegurar iconos pequeños */
+    nav[role="navigation"] svg {
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    /* Hacer la paginación más compacta */
+    nav[role="navigation"] span,
+    nav[role="navigation"] a {
+        padding: 4px 8px !important;
+        font-size: 0.8rem !important;
+        min-width: 30px !important;
+        height: 30px !important;
+    }
+</style>
+
+<!-- Estilos responsivos -->
+<style>
+    /* Responsive para tablets */
+    @media (max-width: 1024px) {
+        .sales-table {
+            font-size: 0.8rem;
+        }
+        
+        .sales-table th, .sales-table td {
+            padding: 0.5rem 0.4rem;
+        }
+        
+        .col-buyer, .col-sellers {
+            width: auto;
+        }
+        
+        .buyer-email {
+            display: none;
+        }
+    }
+
+    /* Responsive para móviles */
+    @media (max-width: 768px) {
+        .sales-table {
+            font-size: 0.75rem;
+        }
+        
+        .sales-table, .sales-table thead, .sales-table tbody, .sales-table th, .sales-table td, .sales-table tr {
+            display: block;
+        }
+        
+        .sales-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+        
+        .sales-table tr {
+            border: 1px solid #f1f3f4;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            padding: 0.5rem;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .sales-table td {
+            border: none;
+            position: relative;
+            padding: 0.5rem 0.5rem 0.5rem 40%;
+            text-align: left;
+        }
+        
+        .sales-table td:before {
+            content: attr(data-label) ": ";
+            position: absolute;
+            left: 0.5rem;
+            width: 35%;
+            text-align: left;
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 0.7rem;
+        }
+        
+        .col-id td:before { content: "ID: "; }
+        .col-date td:before { content: "Fecha: "; }
+        .col-buyer td:before { content: "Comprador: "; }
+        .col-type td:before { content: "Tipo: "; }
+        .col-sellers td:before { content: "Vendedores: "; }
+        .col-items td:before { content: "Items: "; }
+        .col-status td:before { content: "Estado: "; }
+        .col-total td:before { content: "Total: "; }
+        .col-seller-amount td:before { content: "Al Vendedor: "; }
+        .col-commission td:before { content: "Comisión: "; }
+        .col-actions td:before { content: "Acción: "; }
+    }
+
+    /* Estilos para paginación compacta */
+    .pagination {
+        margin: 0;
+        justify-content: center;
+    }
+
+    .pagination .page-link {
+        padding: 0.375rem 0.75rem;
+        margin: 0 2px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background-color: transparent;
+        border-color: #dee2e6;
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    /* Reducir tamaño de iconos de navegación */
+    .pagination .page-link svg,
+    .pagination .page-link i {
+        font-size: 0.75rem !important;
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    /* Estilo para flechas de texto en caso de que no sean SVG */
+    .pagination .page-link:contains("Previous"),
+    .pagination .page-link:contains("Next") {
+        font-size: 0.8rem;
+    }
+
+    .pagination nav {
+        margin: 0 auto;
+    }
+
+    .pagination .flex {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+</style>
 
 <script>
     // Función para eliminar filtros individuales

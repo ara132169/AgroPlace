@@ -140,6 +140,35 @@
         margin-left: 0.5rem;
     }
 
+    /* Estilos para columnas de comisiones */
+    .seller-amount {
+        text-align: center;
+    }
+    
+    .amount-received {
+        color: #28a745;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .amount-pending {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .commission-info {
+        text-align: center;
+    }
+    
+    .commission-amount {
+        font-weight: 500;
+        color: #fd7e14;
+    }
+    
+    .commission-pending {
+        font-style: italic;
+    }
+
     /* Botón VIEW simple */
     .btn-view {
         background: transparent;
@@ -247,7 +276,9 @@
                     <th>Cliente</th>
                     <th>Productos</th>
                     <th>Estado</th>
-                    <th>Total</th>
+                    <th>Total Venta</th>
+                    <th>💰 Tu Ganancia</th>
+                    <th>📊 Comisión</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -284,8 +315,26 @@
                             @endif
                         </span>
                     </td>
-                    <td class="order-total" data-label="Total">
-                        ${{ number_format($venta->total_seller_amount, 2) }}
+                    <td class="order-total" data-label="Total Venta">
+                        ${{ number_format($venta->total, 2) }}
+                    </td>
+                    <td class="seller-amount" data-label="💰 Tu Ganancia">
+                        @if($venta->seller_amount)
+                            <span class="amount-received">${{ number_format($venta->seller_amount, 2) }}</span>
+                            <small class="text-success d-block">(85% del total)</small>
+                        @else
+                            <span class="amount-pending">${{ number_format($venta->total * 0.85, 2) }}</span>
+                            <small class="text-muted d-block">(Pendiente)</small>
+                        @endif
+                    </td>
+                    <td class="commission-info" data-label="📊 Comisión">
+                        @if($venta->platform_fee)
+                            <span class="commission-amount text-warning">${{ number_format($venta->platform_fee, 2) }}</span>
+                            <small class="text-muted d-block">(15% retenido)</small>
+                        @else
+                            <span class="commission-pending text-muted">${{ number_format($venta->total * 0.15, 2) }}</span>
+                            <small class="text-muted d-block">(15% se retendrá)</small>
+                        @endif
                     </td>
                     <td data-label="Acciones">
                         <a href="{{ route('tienda.venta.detalle', $venta->id) }}" class="btn-view">

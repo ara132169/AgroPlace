@@ -58,13 +58,46 @@ class SellerController extends Controller
         $saved = $seller->save();
 
         if( $saved ){
-            return redirect()->route('tienda.registro-realizado')->with('success','Registro realizado');
-        }
- 
-           else{
-              return redirect()->route('tienda.registrar')->with('fail','Hubo un error al registrarte.');
+            // Enviar correo de confirmación al nuevo vendedor
+            try {
+                \Mail::to($seller->email)->send(new \App\Mail\SellerRegistrationConfirmation($seller));
+                
+                // Log del envío exitoso
+                \Log::info('Correo de confirmación enviado a nuevo vendedor', [
+                    'seller_id' => $seller->id,
+                    'seller_email' => $seller->email,
+                    'seller_name' => $seller->name
+                ]);
+            } catch (\Exception $e) {
+                // Log del error pero no fallar el registro
+                \Log::error('Error enviando correo de confirmación a vendedor', [
+                    'seller_id' => $seller->id,
+                    'error' => $e->getMessage()
+                ]);
             }
-      
+
+            // Enviar notificación al administrador
+            try {
+                $adminEmail = config('mail.admin_email', 'admin@agroplace.com');
+                \Mail::to($adminEmail)->send(new \App\Mail\NewSellerRegistrationNotification($seller));
+                
+                // Log del envío exitoso
+                \Log::info('Notificación de nuevo registro enviada al administrador', [
+                    'seller_id' => $seller->id,
+                    'admin_email' => $adminEmail
+                ]);
+            } catch (\Exception $e) {
+                // Log del error pero no fallar el registro
+                \Log::error('Error enviando notificación al administrador', [
+                    'seller_id' => $seller->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            return redirect()->route('tienda.registro-realizado')->with('success','Registro realizado exitosamente. Revisa tu correo electrónico para más información.');
+        } else {
+            return redirect()->route('tienda.registrar')->with('fail','Hubo un error al registrarte.');
+        }
     }
 
     public function registroRealizado(Request $request){
@@ -300,6 +333,9 @@ class SellerController extends Controller
                     'order' => $order,
                     'items_count' => $totalItems,
                     'total_seller_amount' => $totalAmount,
+                    'total' => $order->total, // Total completo de la orden
+                    'platform_fee' => $order->platform_fee, // Comisión de la plataforma
+                    'seller_amount' => $order->seller_amount, // Monto que recibe el vendedor
                     'created_at' => $order->created_at,
                     'status' => $order->status,
                     'client_name' => $order->client->name ?? 'Cliente no disponible',
@@ -347,9 +383,20 @@ class SellerController extends Controller
     {
         $seller = Auth::guard('seller')->user();
         
-        // Obtener las compras del vendedor directamente usando seller_id
-        $compras = Order::where('orders.seller_id', $seller->id)
-            ->where('orders.buyer_type', 'seller')
+        // Las "compras" del vendedor son órdenes donde existe un client con el mismo email
+        // Buscar si existe un cliente con el mismo email del vendedor
+        $client = Client::where('email', $seller->email)->first();
+        
+        if (!$client) {
+            // Si no existe cliente con el mismo email, no tiene compras
+            return view('back.pages.tienda.compras.mis-compras', [
+                'compras' => collect([]), 
+                'sinRegistro' => true
+            ]);
+        }
+        
+        // Buscar órdenes del cliente asociado
+        $compras = Order::where('orders.client_id', $client->id)
             ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
             ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
             ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
@@ -360,6 +407,8 @@ class SellerController extends Controller
                 'orders.total',
                 'orders.shipping_address',
                 'orders.shipping_phone',
+                'orders.platform_fee',
+                'orders.seller_amount',
                 DB::raw('COUNT(DISTINCT order_items.id) as items_count'),
                 DB::raw('GROUP_CONCAT(DISTINCT sellers.name) as vendedores'),
                 DB::raw('GROUP_CONCAT(DISTINCT sellers.id) as seller_ids')
@@ -370,7 +419,9 @@ class SellerController extends Controller
                 'orders.status',
                 'orders.total',
                 'orders.shipping_address',
-                'orders.shipping_phone'
+                'orders.shipping_phone',
+                'orders.platform_fee',
+                'orders.seller_amount'
             )
             ->orderBy('orders.created_at', 'desc')
             ->paginate(10);
@@ -388,10 +439,16 @@ class SellerController extends Controller
     {
         $seller = Auth::guard('seller')->user();
         
-        // Verificar que la orden pertenece al vendedor
+        // Buscar si existe un cliente con el mismo email del vendedor
+        $client = Client::where('email', $seller->email)->first();
+        
+        if (!$client) {
+            return redirect()->route('tienda.compras')->with('error', 'No tienes compras registradas');
+        }
+        
+        // Verificar que la orden pertenece al cliente asociado al vendedor
         $order = Order::where('orders.id', $orderId)
-            ->where('orders.seller_id', $seller->id)
-            ->where('orders.buyer_type', 'seller')
+            ->where('orders.client_id', $client->id)
             ->first();
         
         if (!$order) {

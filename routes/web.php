@@ -28,6 +28,16 @@
 
 Route::get('/', [FrontEndController::class, 'index'])->name('inicio');
 
+// Ruta AJAX para popup de login
+Route::get('/ajax/login', function() {
+    return view('front.ajax.login');
+})->name('ajax.login');
+
+// Ruta alternativa para testing
+Route::get('/test-ajax-login', function() {
+    return view('front.ajax.login');
+});
+
 // RUTA DE PRUEBA SIMPLE - DEBE ESTAR AL PRINCIPIO
 Route::get('/test-simple', function() {
     return 'RUTA FUNCIONA - NO HAY REDIRECCIÓN';

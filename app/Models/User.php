@@ -42,4 +42,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    
+    /**
+     * Obtener todas las cuentas de pago del vendedor
+     */
+    public function paymentAccounts()
+    {
+        return $this->hasMany(SellerPaymentAccount::class, 'seller_id');
+    }
+    
+    /**
+     * Obtener la cuenta de pago activa del vendedor
+     */
+    public function activePaymentAccount()
+    {
+        return $this->hasOne(SellerPaymentAccount::class, 'seller_id')
+                   ->where('is_active', true);
+    }
 }

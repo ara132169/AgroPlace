@@ -366,16 +366,32 @@
                 });
             @endphp
             <div class="summary-row">
-                <span>Subtotal:</span>
-                <span>${{ number_format($subtotal, 2) }}</span>
+                <span>Total de la venta:</span>
+                <span>${{ number_format($order->total, 2) }}</span>
             </div>
-            <div class="summary-row">
+            <div class="summary-row" style="color: #fd7e14; font-weight: 500;">
+                <span>💸 Comisión plataforma (15%):</span>
+                <span>
+                    @if($order->platform_fee)
+                        ${{ number_format($order->platform_fee, 2) }}
+                    @else
+                        ${{ number_format($order->total * 0.15, 2) }} (estimado)
+                    @endif
+                </span>
+            </div>
+            <div class="summary-row" style="border-top: 2px solid #e9ecef; margin-top: 10px; padding-top: 15px;">
                 <span>Envío:</span>
                 <span>Manejado por la plataforma</span>
             </div>
-            <div class="summary-row total">
-                <span>Tus ganancias:</span>
-                <span>${{ number_format($subtotal, 2) }}</span>
+            <div class="summary-row total" style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                <span style="color: #28a745; font-weight: 600;">💰 Tus ganancias netas:</span>
+                <span style="color: #28a745; font-weight: 600;">
+                    @if($order->seller_amount)
+                        ${{ number_format($order->seller_amount, 2) }}
+                    @else
+                        ${{ number_format($order->total * 0.85, 2) }} (pendiente)
+                    @endif
+                </span>
             </div>
         </div>
     </div>

@@ -502,20 +502,48 @@
                 });
             @endphp
             <div class="summary-row">
-                <span>Subtotal productos:</span>
-                <span>${{ number_format($subtotal, 2) }}</span>
+                <span>Total de la venta:</span>
+                <span>${{ number_format($order->total, 2) }}</span>
             </div>
             <div class="summary-row">
                 <span>Costo de envío:</span>
-                <span>Incluido</span>
+                <span>Incluido en la plataforma</span>
             </div>
-            <div class="summary-row">
-                <span>Comisión plataforma (estimada):</span>
-                <span>${{ number_format($subtotal * 0.05, 2) }}</span>
+            
+            <!-- Información detallada de comisiones -->
+            <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #fd7e14;">
+                <h6 style="color: #fd7e14; margin-bottom: 10px;"><i class="fa fa-chart-pie"></i> Distribución de Comisiones (15%)</h6>
+                
+                <div class="summary-row" style="font-size: 0.9rem; color: #6c757d;">
+                    <span>💰 Monto al vendedor (85%):</span>
+                    <span>
+                        @if($order->seller_amount)
+                            <strong style="color: #28a745;">${{ number_format($order->seller_amount, 2) }}</strong>
+                            <small class="text-success"> ✅ Transferido</small>
+                        @else
+                            <strong style="color: #ffc107;">${{ number_format($order->total * 0.85, 2) }}</strong>
+                            <small class="text-warning"> ⏳ Pendiente</small>
+                        @endif
+                    </span>
+                </div>
+                
+                <div class="summary-row" style="font-size: 0.9rem; color: #6c757d;">
+                    <span>📊 Comisión plataforma (15%):</span>
+                    <span>
+                        @if($order->platform_fee)
+                            <strong style="color: #28a745;">${{ number_format($order->platform_fee, 2) }}</strong>
+                            <small class="text-success"> ✅ Cobrada</small>
+                        @else
+                            <strong style="color: #007bff;">${{ number_format($order->total * 0.15, 2) }}</strong>
+                            <small class="text-primary"> ⏳ Por cobrar</small>
+                        @endif
+                    </span>
+                </div>
             </div>
-            <div class="summary-row total">
-                <span>Total del pedido:</span>
-                <span>${{ number_format($order->total, 2) }}</span>
+            
+            <div class="summary-row total" style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <span style="color: #28a745; font-weight: 600;">💸 Total procesado:</span>
+                <span style="color: #28a745; font-weight: 600;">${{ number_format($order->total, 2) }}</span>
             </div>
         </div>
     </div>
